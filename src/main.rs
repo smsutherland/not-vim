@@ -20,7 +20,7 @@ fn main() -> io::Result<()> {
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
 
-    let mut term = Terminal::new(stdout)?;
+    let mut term = Terminal::new();
 
     let mut i = 0;
     term.set_cursor(i)?;

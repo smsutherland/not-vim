@@ -2,7 +2,7 @@
 //!
 //! Contains information about [Buffer]s and individual [Cell]s.
 
-use std::io::{self, Write};
+use std::io::{self, Stdout, Write};
 
 use crossterm::{cursor::MoveTo, execute, queue, style::Print, terminal};
 
@@ -118,7 +118,7 @@ impl Rect {
 
 /// Representation of a terminal which can be written to and displayed.
 #[derive(Debug)]
-pub struct Terminal<W: Write> {
+pub struct Terminal {
     /// The write buffer and the display buffer.
     buffers: [Buffer; 2],
     /// Which buffer is being written to.
@@ -127,19 +127,17 @@ pub struct Terminal<W: Write> {
     /// The `1 - current_buf` is currently being displayed.
     current_buf: usize,
     /// The writer being used to write the editor to.
-    writer: W,
+    stdout: Stdout,
 }
 
-impl<W: Write> Terminal<W> {
-    /// Create a Terminal based around the writer provided.
-    ///
-    /// This will usually be Stdout.
-    pub fn new(writer: W) -> io::Result<Self> {
-        Ok(Self {
+impl Terminal {
+    /// Create a Terminal around Stdout.
+    pub fn new() -> Self {
+        Self {
             buffers: [Buffer::default(), Buffer::default()],
             current_buf: 0,
-            writer,
-        })
+            stdout: io::stdout(),
+        }
     }
 
     /// Write the contents of the current [Buffer] to the terminal.
@@ -151,11 +149,11 @@ impl<W: Write> Terminal<W> {
         let diff = self.current_buf().diff(self.display_buf());
 
         for (cell, x, y) in diff {
-            queue!(self.writer, MoveTo(x, y))?;
-            queue!(self.writer, Print(cell.symbol))?;
+            queue!(self.stdout, MoveTo(x, y))?;
+            queue!(self.stdout, Print(cell.symbol))?;
         }
 
-        self.writer.flush()?;
+        self.stdout.flush()?;
 
         // swap buffers
         self.current_buf = 1 - self.current_buf;
@@ -172,7 +170,7 @@ impl<W: Write> Terminal<W> {
     /// Move the cursor to the position represented by the index `i`.
     pub fn set_cursor(&mut self, i: usize) -> io::Result<()> {
         execute!(
-            self.writer,
+            self.stdout,
             MoveTo(
                 (i % self.buffers[self.current_buf].area.width as usize) as u16,
                 (i / self.buffers[self.current_buf].area.width as usize) as u16,
