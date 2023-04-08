@@ -1,3 +1,11 @@
+#![warn(missing_docs)]
+#![warn(clippy::missing_docs_in_private_items)]
+
+//! Not Vim is, well, just that.
+//!
+//! I'm just messing around trying to make my own editor because learning vimscript or lua is too
+//! much work. ¯\\_(ツ)_/¯
+
 use crossterm::{
     event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
@@ -18,6 +26,7 @@ fn main() -> io::Result<()> {
     term.set_cursor(i)?;
 
     loop {
+        term.resize();
         term.draw()?;
 
         if let Event::Key(event) = read()? {
