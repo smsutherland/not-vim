@@ -149,8 +149,9 @@ impl Terminal {
         let diff = self.current_buf().diff(self.display_buf());
 
         for (cell, x, y) in diff {
-            queue!(self.stdout, MoveTo(x, y))?;
-            queue!(self.stdout, Print(cell.symbol))?;
+            // potential optimization: don't queue a MoveTo if the previous character was right
+            // before this one.
+            queue!(self.stdout, MoveTo(x, y), Print(cell.symbol))?;
         }
 
         self.stdout.flush()?;
