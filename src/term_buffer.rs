@@ -35,7 +35,7 @@ impl Buffer {
     /// `self` and the other [Buffer].
     ///
     /// This vector also contains the positions of the cells.
-    fn diff(&self, other: &Buffer) -> Vec<(Cell, u16, u16)> {
+    fn diff(&self, other: &Self) -> Vec<(Cell, u16, u16)> {
         if self.area != other.area {
             enumerate_2d(&self.content, self.area).collect()
         } else {
@@ -91,7 +91,7 @@ impl Default for Buffer {
 }
 
 /// A simple struct representing a rectangular region of the terminal.
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Rect {
     /// The coordinate of the top side of the rectangle.
     pub top: u16,
@@ -107,7 +107,7 @@ impl Rect {
     /// Get a rect representing the current size of the terminal being written to.
     fn get_size() -> Self {
         let (width, height) = terminal::size().unwrap();
-        Rect {
+        Self {
             top: 0,
             left: 0,
             height,

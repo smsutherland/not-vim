@@ -2,6 +2,11 @@
 name = "not-vim"
 version = "0.1.0"
 edition = "2021"
+description = "I'm not sure what this is but it sure isn't vim"
+repository = "https://github.com/smsutherland/not-vim"
+authors = ["Sagan Sutherland <sagan@farthinghalearms.com>"]
+categories = ["editor", "command-line-utilities"]
+keywords = ["editor"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

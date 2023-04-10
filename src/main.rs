@@ -55,13 +55,11 @@ fn main() -> io::Result<()> {
                 term.set_cursor(i)?;
             }
 
-            if let KeyCode::Left = event.code {
-                if i != 0 {
-                    i -= 1;
-                    term.set_cursor(i)?;
-                }
+            if event.code == KeyCode::Left && i != 0 {
+                i -= 1;
+                term.set_cursor(i)?;
             }
-            if let KeyCode::Right = event.code {
+            if event.code == KeyCode::Right {
                 i += 1;
                 term.set_cursor(i)?;
             }
