@@ -7,21 +7,24 @@
 use crate::term_buffer::{Frame, Render};
 
 /// Placeholder struct for the whole editor.
-pub struct Editor {}
+pub struct Editor {
+    status_bar: StatusBar,
+    edit_area: EditArea,
+}
 
 impl Render for Editor {
     fn render(&self, frame: &mut Frame) -> std::io::Result<()> {
         frame.clear();
-        let s = StatusLine {};
+        let s = StatusBar {};
         s.render(frame)?;
         Ok(())
     }
 }
 
 /// Placeholder struct for the bottom status bar of the editor.
-struct StatusLine {}
+struct StatusBar {}
 
-impl Render for StatusLine {
+impl Render for StatusBar {
     fn render(&self, frame: &mut Frame) -> std::io::Result<()> {
         let region = frame.region();
         let bottom = region.height - 1;
@@ -31,3 +34,5 @@ impl Render for StatusLine {
         Ok(())
     }
 }
+
+struct EditArea {}
