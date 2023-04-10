@@ -14,6 +14,7 @@ use crossterm::{
 use std::io;
 use term_buffer::Terminal;
 
+mod editor;
 mod term_buffer;
 
 fn main() -> io::Result<()> {
@@ -25,9 +26,14 @@ fn main() -> io::Result<()> {
     let mut i = 0;
     term.set_cursor(i)?;
 
+    let e = editor::Editor {};
+
     loop {
         term.resize();
-        term.draw()?;
+        term.draw(|f| {
+            f.render(&e)?;
+            Ok(())
+        })?;
 
         if let Event::Key(event) = read()? {
             if !matches!(event.kind, KeyEventKind::Press | KeyEventKind::Repeat) {

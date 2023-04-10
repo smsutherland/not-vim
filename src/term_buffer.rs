@@ -92,15 +92,15 @@ impl Default for Buffer {
 
 /// A simple struct representing a rectangular region of the terminal.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-struct Rect {
+pub struct Rect {
     /// The coordinate of the top side of the rectangle.
-    top: u16,
+    pub top: u16,
     /// The coordinate of the left side of the rectangle.
-    left: u16,
+    pub left: u16,
     /// Height of the rectangle.
-    height: u16,
+    pub height: u16,
     /// Width of the rectangle
-    width: u16,
+    pub width: u16,
 }
 
 impl Rect {
@@ -145,7 +145,7 @@ impl Terminal {
     /// This will draw the current [Buffer], then swap the current and back buffers.
     /// The new current buffer is made into a copy of the new back buffer (the one which just got
     /// drawn to the terminal).
-    pub fn draw(&mut self) -> io::Result<()> {
+    fn flush(&mut self) -> io::Result<()> {
         let diff = self.current_buf().diff(self.display_buf());
 
         for (cell, x, y) in diff {
@@ -206,4 +206,84 @@ impl Terminal {
     // fn display_buf_mut(&mut self) -> &mut Buffer {
     //     &mut self.buffers[1 - self.current_buf]
     // }
+
+    // Concise description stolen from tui.
+    /// Synchronizes terminal size, calls the rendering closure, flushes the current internal state and prepares for the next draw call.
+    pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> io::Result<()>) -> io::Result<()> {
+        draw(&mut Frame {
+            region: self.current_buf().area,
+            buffer: self.current_buf_mut(),
+        })?;
+        self.flush()
+    }
+}
+
+/// An abstraction around drawing to a region of a [Buffer].
+pub struct Frame<'a> {
+    /// The underlying [Buffer] being drawn to.
+    buffer: &'a mut Buffer,
+    /// The region of the [Buffer] being drawn to.
+    region: Rect,
+}
+
+impl<'a> Frame<'a> {
+    /// Draw a [Render]able item to the [Frame].
+    pub fn render(&mut self, item: &impl Render) -> io::Result<()> {
+        item.render(self)
+    }
+
+    /// Sets the char at a single location in the frame.
+    pub fn set_char(&mut self, c: char, mut x: u16, mut y: u16) {
+        // Should these panic or should the function return a Result?
+        if x >= self.region.width {
+            todo!("panic message");
+        }
+        if y >= self.region.height {
+            todo!("panic message");
+        }
+
+        x += self.region.left;
+        y += self.region.top;
+
+        let i = x as usize + self.buffer.area.width as usize * y as usize;
+        self.buffer.content[i].symbol = c;
+    }
+
+    /// Returns the region of this [`Frame`].
+    pub fn region(&self) -> Rect {
+        self.region
+    }
+
+    /// Clear the whole underlying buffer.
+    pub fn clear(&mut self) {
+        for y in self.region.top..(self.region.top + self.region.height) {
+            for x in self.region.left..(self.region.left + self.region.width) {
+                let i = self.buffer.area.width as usize * y as usize + x as usize;
+                self.buffer.content[i] = Cell::default();
+            }
+        }
+        self.buffer.content.fill(Cell::default())
+    }
+}
+
+/// Take a [Frame] and draw to its underlying [Buffer].
+///
+/// This is currently achieved by mainly using the [Frame::set_char] method, which allows you to,
+/// one character at a time, draw out the content being displayed. [Frame::render] can be called to
+/// draw other objects implimenting [Render].
+///
+/// Example implimentation of [Render] on [String]:
+/// ```
+/// impl Render for String {
+///     fn render(&self, frame: &mut Frame) -> io::Result<()> {
+///         for (i, c) in self.chars().enumerate() {
+///             frame.set_char(c, i, 0);
+///         }
+///         Ok(())
+///     }
+/// }
+/// ```
+pub trait Render {
+    /// Take a [Frame] and draw to its underlying [Buffer].
+    fn render(&self, frame: &mut Frame) -> io::Result<()>;
 }
