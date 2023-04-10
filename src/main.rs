@@ -12,10 +12,10 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io;
-use term_buffer::Terminal;
+use tui::Terminal;
 
 mod editor;
-mod term_buffer;
+mod tui;
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;

@@ -4,7 +4,7 @@
 //! Right now this is only the [Editor] itself and the [StatusLine].
 //! These are only placeholder structs currently.
 
-use crate::term_buffer::{Frame, Render};
+use crate::tui::{Frame, Render};
 
 /// Placeholder struct for the whole editor.
 #[derive(Debug, Default)]
