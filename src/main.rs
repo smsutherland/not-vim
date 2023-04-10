@@ -27,7 +27,7 @@ fn main() -> io::Result<()> {
     let mut i = 0;
     term.set_cursor(i)?;
 
-    let e = editor::Editor {};
+    let e = editor::Editor::default();
 
     loop {
         term.resize();

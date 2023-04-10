@@ -7,6 +7,7 @@
 use crate::term_buffer::{Frame, Render};
 
 /// Placeholder struct for the whole editor.
+#[derive(Debug, Default)]
 pub struct Editor {
     status_bar: StatusBar,
     edit_area: EditArea,
@@ -22,6 +23,7 @@ impl Render for Editor {
 }
 
 /// Placeholder struct for the bottom status bar of the editor.
+#[derive(Debug, Default)]
 struct StatusBar {}
 
 impl Render for StatusBar {
@@ -35,4 +37,5 @@ impl Render for StatusBar {
     }
 }
 
+#[derive(Debug, Default)]
 struct EditArea {}
