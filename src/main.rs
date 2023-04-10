@@ -9,7 +9,7 @@
 use crossterm::{
     event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen},
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io;
 use term_buffer::Terminal;
@@ -18,6 +18,7 @@ mod editor;
 mod term_buffer;
 
 fn main() -> io::Result<()> {
+    enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
 
@@ -67,6 +68,7 @@ fn main() -> io::Result<()> {
         }
     }
 
+    disable_raw_mode()?;
     execute!(io::stdout(), LeaveAlternateScreen)?;
 
     Ok(())
