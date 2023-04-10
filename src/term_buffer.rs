@@ -127,6 +127,7 @@ pub struct Terminal {
     /// The `1 - current_buf` is currently being displayed.
     current_buf: usize,
     /// The writer being used to write the editor to.
+    // TODO: Should this be a StdoutLock?
     stdout: Stdout,
 }
 
