@@ -3,10 +3,14 @@
 //! Contains information about [Buffer]s and individual [Cell]s.
 
 mod frame;
+pub mod rect;
+mod text;
 
-use crossterm::{cursor::MoveTo, execute, queue, style::Print, terminal};
+use crossterm::{cursor::MoveTo, execute, queue, style::Print};
 pub use frame::Frame;
+pub use rect::Rect;
 use std::io::{self, Stdout, Write};
+pub use text::Text;
 
 /// All the information regarding the content of a single cell of a terminal.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -89,37 +93,6 @@ impl Default for Buffer {
 
         let content = vec![Cell::default(); area.height as usize * area.width as usize];
         Self { content, area }
-    }
-}
-
-/// A simple struct representing a rectangular region of the terminal.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct Rect {
-    /// The coordinate of the top side of the rectangle.
-    pub top: u16,
-    /// The coordinate of the left side of the rectangle.
-    pub left: u16,
-    /// Height of the rectangle.
-    pub height: u16,
-    /// Width of the rectangle
-    pub width: u16,
-}
-
-impl Rect {
-    /// Get a rect representing the current size of the terminal being written to.
-    fn get_size() -> Self {
-        let (width, height) =
-            terminal::size().expect("unable to get the dimensions of the terminal");
-        Self {
-            top: 0,
-            left: 0,
-            height,
-            width,
-        }
-    }
-
-    pub fn partition<S: Partition>(self, partition: S) -> Vec<Rect> {
-        partition.partition(self)
     }
 }
 
@@ -245,10 +218,4 @@ impl Terminal {
 pub trait Render {
     /// Take a [Frame] and draw to its underlying [Buffer].
     fn render(&self, frame: &mut Frame, region: Rect) -> io::Result<()>;
-}
-
-// TODO: Is there some way to return something like [Rect; 4]
-// or maybe Iterator<Item = Rect>?
-pub trait Partition {
-    fn partition(&self, area: Rect) -> Vec<Rect>;
 }

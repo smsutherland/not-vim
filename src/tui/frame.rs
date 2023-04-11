@@ -16,27 +16,19 @@ impl Frame<'_> {
         item.render(self, region)
     }
 
-    // /// Sets the char at a single location in the frame.
-    // pub fn set_char(&mut self, c: char, mut x: u16, mut y: u16) {
-    //     // Should these panic or should the function return a Result?
-    //     if x >= self.region.width {
-    //         todo!("panic message");
-    //     }
-    //     if y >= self.region.height {
-    //         todo!("panic message");
-    //     }
-    //
-    //     x += self.region.left;
-    //     y += self.region.top;
-    //
-    //     let i = x as usize + self.buffer.area.width as usize * y as usize;
-    //     self.buffer.content[i].symbol = c;
-    // }
+    /// Sets the char at a single location in the frame.
+    pub fn set_char(&mut self, c: char, x: u16, y: u16) {
+        // Should these panic or should the function return a Result?
+        if x >= self.buffer.area.width {
+            todo!("panic message");
+        }
+        if y >= self.buffer.area.height {
+            todo!("panic message");
+        }
 
-    // /// Returns the region of this [`Frame`].
-    // pub fn region(&self) -> Rect {
-    //     self.region
-    // }
+        let i = x as usize + self.buffer.area.width as usize * y as usize;
+        self.buffer.content[i].symbol = c;
+    }
 
     pub fn size(&self) -> Rect {
         self.buffer.area
