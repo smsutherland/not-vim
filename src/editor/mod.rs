@@ -9,7 +9,9 @@ use crate::tui::{Frame, Render};
 /// Placeholder struct for the whole editor.
 #[derive(Debug, Default)]
 pub struct Editor {
+    /// The status bar at the bottom of the editor area.
     status_bar: StatusBar,
+    /// The region of the terminal where the editing actually takes place.
     edit_area: EditArea,
 }
 
@@ -37,5 +39,6 @@ impl Render for StatusBar {
     }
 }
 
+/// The area where the editing happens.
 #[derive(Debug, Default)]
 struct EditArea {}
