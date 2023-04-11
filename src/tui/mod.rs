@@ -108,7 +108,8 @@ pub struct Rect {
 impl Rect {
     /// Get a rect representing the current size of the terminal being written to.
     fn get_size() -> Self {
-        let (width, height) = terminal::size().unwrap();
+        let (width, height) =
+            terminal::size().expect("unable to get the dimensions of the terminal");
         Self {
             top: 0,
             left: 0,
