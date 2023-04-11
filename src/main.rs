@@ -1,5 +1,6 @@
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
+#![warn(clippy::unwrap_used)]
 
 //! Not Vim is, well, just that.
 //!
