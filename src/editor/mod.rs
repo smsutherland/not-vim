@@ -4,7 +4,7 @@
 //! Right now this is only the [Editor] itself and the [StatusLine].
 //! These are only placeholder structs currently.
 
-use crate::tui::{Frame, Render};
+use crate::tui::{Frame, Rect, Render};
 
 /// Placeholder struct for the whole editor.
 #[derive(Debug, Default)]
@@ -16,10 +16,10 @@ pub struct Editor {
 }
 
 impl Render for Editor {
-    fn render(&self, frame: &mut Frame) -> std::io::Result<()> {
+    fn render(&self, frame: &mut Frame, region: Rect) -> std::io::Result<()> {
         frame.clear();
         let s = StatusBar {};
-        s.render(frame)?;
+        s.render(frame, frame.size())?;
         Ok(())
     }
 }
@@ -29,12 +29,11 @@ impl Render for Editor {
 struct StatusBar {}
 
 impl Render for StatusBar {
-    fn render(&self, frame: &mut Frame) -> std::io::Result<()> {
-        let region = frame.region();
-        let bottom = region.height - 1;
-        for x in 0..region.width {
-            frame.set_char('a', x, bottom);
-        }
+    fn render(&self, frame: &mut Frame, region: Rect) -> std::io::Result<()> {
+        // let bottom = region.height - 1;
+        // for x in 0..region.width {
+        //     frame.set_char('a', x, bottom);
+        // }
         Ok(())
     }
 }

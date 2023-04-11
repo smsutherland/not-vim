@@ -32,7 +32,7 @@ fn main() -> io::Result<()> {
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&e)?;
+            f.render(&e, f.size())?;
             Ok(())
         })?;
 

@@ -116,6 +116,10 @@ impl Rect {
             width,
         }
     }
+
+    pub fn split<S: Splitter>(self, splitter: S) -> Vec<Rect> {
+        splitter.split(self)
+    }
 }
 
 /// Representation of a terminal which can be written to and displayed.
@@ -214,7 +218,6 @@ impl Terminal {
     /// Synchronizes terminal size, calls the rendering closure, flushes the current internal state and prepares for the next draw call.
     pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> io::Result<()>) -> io::Result<()> {
         draw(&mut Frame {
-            region: self.current_buf().area,
             buffer: self.current_buf_mut(),
         })?;
         self.flush()
@@ -240,5 +243,11 @@ impl Terminal {
 /// ```
 pub trait Render {
     /// Take a [Frame] and draw to its underlying [Buffer].
-    fn render(&self, frame: &mut Frame) -> io::Result<()>;
+    fn render(&self, frame: &mut Frame, region: Rect) -> io::Result<()>;
+}
+
+// TODO: Is there some way to return something like [Rect; 4]
+// or maybe Iterator<Item = Rect>?
+pub trait Splitter {
+    fn split(&self, area: Rect) -> Vec<Rect>;
 }
