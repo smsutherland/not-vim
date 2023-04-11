@@ -118,8 +118,8 @@ impl Rect {
         }
     }
 
-    pub fn split<S: Splitter>(self, splitter: S) -> Vec<Rect> {
-        splitter.split(self)
+    pub fn partition<S: Partition>(self, partition: S) -> Vec<Rect> {
+        partition.partition(self)
     }
 }
 
@@ -249,6 +249,6 @@ pub trait Render {
 
 // TODO: Is there some way to return something like [Rect; 4]
 // or maybe Iterator<Item = Rect>?
-pub trait Splitter {
-    fn split(&self, area: Rect) -> Vec<Rect>;
+pub trait Partition {
+    fn partition(&self, area: Rect) -> Vec<Rect>;
 }
