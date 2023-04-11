@@ -42,10 +42,16 @@ pub struct Bottom;
 
 impl Partition for Bottom {
     fn partition(&self, area: Rect) -> Vec<Rect> {
-        vec![Rect {
-            top: area.top + area.height - 1,
-            height: 1,
-            ..area
-        }]
+        vec![
+            Rect {
+                top: area.top + area.height - 1,
+                height: 1,
+                ..area
+            },
+            Rect {
+                height: area.height - 1,
+                ..area
+            },
+        ]
     }
 }

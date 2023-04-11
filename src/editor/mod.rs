@@ -16,11 +16,14 @@ pub struct Editor {
 }
 
 impl Render for Editor {
-    fn render(&self, frame: &mut Frame, region: Rect) -> std::io::Result<()> {
+    fn render(&self, frame: &mut Frame, region: Rect) {
         frame.clear();
         let s = StatusBar {};
-        s.render(frame, frame.size().partition(Bottom)[0])?;
-        Ok(())
+        let regions = frame.size().partition(Bottom);
+        let bottom_bar = regions[0];
+        let editor_area = regions[1];
+        frame.render(&s, bottom_bar);
+        frame.render(&self.edit_area, editor_area);
     }
 }
 
@@ -29,15 +32,18 @@ impl Render for Editor {
 struct StatusBar {}
 
 impl Render for StatusBar {
-    fn render(&self, frame: &mut Frame, region: Rect) -> std::io::Result<()> {
+    fn render(&self, frame: &mut Frame, region: Rect) {
         let bottom = region.top + region.height - 1;
         for x in 0..region.width {
-            frame.set_char('a', x, bottom);
+            frame.set_char('█', x, bottom);
         }
-        Ok(())
     }
 }
 
 /// The area where the editing happens.
 #[derive(Debug, Default)]
 struct EditArea {}
+
+impl Render for EditArea {
+    fn render(&self, frame: &mut Frame, region: Rect) {}
+}

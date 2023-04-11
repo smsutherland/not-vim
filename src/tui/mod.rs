@@ -190,10 +190,10 @@ impl Terminal {
 
     // Concise description stolen from tui.
     /// Synchronizes terminal size, calls the rendering closure, flushes the current internal state and prepares for the next draw call.
-    pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> io::Result<()>) -> io::Result<()> {
+    pub fn draw(&mut self, draw: impl Fn(&mut Frame)) -> io::Result<()> {
         draw(&mut Frame {
             buffer: self.current_buf_mut(),
-        })?;
+        });
         self.flush()
     }
 }
@@ -217,5 +217,5 @@ impl Terminal {
 /// ```
 pub trait Render {
     /// Take a [Frame] and draw to its underlying [Buffer].
-    fn render(&self, frame: &mut Frame, region: Rect) -> io::Result<()>;
+    fn render(&self, frame: &mut Frame, region: Rect);
 }

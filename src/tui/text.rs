@@ -5,7 +5,7 @@ pub struct Text {
 }
 
 impl Render for Text {
-    fn render(&self, frame: &mut Frame, region: Rect) -> std::io::Result<()> {
+    fn render(&self, frame: &mut Frame, region: Rect) {
         todo!()
     }
 }

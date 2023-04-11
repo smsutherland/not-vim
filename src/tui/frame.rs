@@ -12,8 +12,8 @@ pub struct Frame<'a> {
 impl Frame<'_> {
     /// Draw a [Render]able item to the [Frame].
     #[inline]
-    pub fn render(&mut self, item: &impl Render, region: Rect) -> io::Result<()> {
-        item.render(self, region)
+    pub fn render(&mut self, item: &impl Render, region: Rect) {
+        item.render(self, region);
     }
 
     /// Sets the char at a single location in the frame.

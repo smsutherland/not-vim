@@ -1,6 +1,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(clippy::unwrap_used)]
+#![warn(clippy::unnecessary_wraps)]
 
 //! Not Vim is, well, just that.
 //!
@@ -33,8 +34,7 @@ fn main() -> io::Result<()> {
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&e, f.size())?;
-            Ok(())
+            f.render(&e, f.size());
         })?;
 
         if let Event::Key(event) = read()? {
