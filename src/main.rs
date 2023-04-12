@@ -10,7 +10,7 @@
 
 use args::Args;
 use crossterm::{
-    event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
+    event::{read, Event, KeyCode, KeyEventKind, KeyModifiers},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };

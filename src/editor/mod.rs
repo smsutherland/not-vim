@@ -12,7 +12,7 @@ use crate::tui::{rect::Bottom, Frame, Rect, Render, Text};
 #[derive(Debug, Default)]
 pub struct Editor {
     /// The status bar at the bottom of the editor area.
-    status_bar: StatusBar,
+    _status_bar: StatusBar,
     /// The region of the terminal where the editing actually takes place.
     edit_area: EditArea,
     /// The file being operated on.
@@ -25,14 +25,16 @@ impl Editor {
         self.edit_area.push(c);
     }
 
+    /// Remove the last character in the [`EditArea`].
     pub fn backspace(&mut self) {
         self.edit_area.backspace();
     }
 
+    /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> io::Result<Self> {
         let file = std::fs::read_to_string(fname)?;
         Ok(Self {
-            status_bar: StatusBar {},
+            _status_bar: StatusBar {},
             edit_area: EditArea {
                 lines: file.lines().map(ToOwned::to_owned).collect(),
             },
@@ -40,6 +42,7 @@ impl Editor {
         })
     }
 
+    /// Write the current contents of the buffer to the file it came from.
     pub fn write(&self) -> io::Result<()> {
         std::fs::write(&self.file, self.edit_area.to_string())?;
         Ok(())
@@ -50,7 +53,7 @@ impl Render for Editor {
     fn render(&self, frame: &mut Frame, region: Rect) {
         frame.clear();
         let s = StatusBar {};
-        let regions = frame.size().partition(Bottom);
+        let regions = region.partition(Bottom);
         let bottom_bar = regions[0];
         let editor_area = regions[1];
         frame.render(&s, bottom_bar);
@@ -99,6 +102,8 @@ impl EditArea {
         }
     }
 
+    /// Remove the last character in the last line of the buffer.
+    /// If the last line is empty, removes the last line.
     fn backspace(&mut self) {
         if let Some(line) = self.lines.last_mut() {
             if !line.is_empty() {
@@ -108,7 +113,9 @@ impl EditArea {
             }
         }
     }
+}
 
+impl ToString for EditArea {
     fn to_string(&self) -> String {
         self.lines.join("\n")
     }
