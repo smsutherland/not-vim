@@ -1,7 +1,6 @@
 //! A [Frame] represents a single region of a terminal which can be drawn to.
 
 use super::{Buffer, Rect, Render};
-use std::io;
 
 /// An abstraction around drawing to a region of a [Buffer].
 pub struct Frame<'a> {

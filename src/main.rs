@@ -26,15 +26,12 @@ fn main() -> io::Result<()> {
 
     let mut term = Terminal::new();
 
-    let mut i = 0;
-    term.set_cursor(i)?;
-
-    let e = editor::Editor::default();
+    let mut editor = editor::Editor::default();
 
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&e, f.size());
+            f.render(&editor, f.size());
         })?;
 
         if let Event::Key(event) = read()? {
@@ -51,18 +48,10 @@ fn main() -> io::Result<()> {
             }
 
             if let KeyCode::Char(c) = event.code {
-                term.set(c, i);
-                i += 1;
-                term.set_cursor(i)?;
+                editor.push(c);
             }
-
-            if event.code == KeyCode::Left && i != 0 {
-                i -= 1;
-                term.set_cursor(i)?;
-            }
-            if event.code == KeyCode::Right {
-                i += 1;
-                term.set_cursor(i)?;
+            if let KeyCode::Enter = event.code {
+                editor.push('\n');
             }
         }
     }

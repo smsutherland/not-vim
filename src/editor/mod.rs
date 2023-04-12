@@ -4,7 +4,7 @@
 //! Right now this is only the [Editor] itself and the [StatusLine].
 //! These are only placeholder structs currently.
 
-use crate::tui::{rect::Bottom, Frame, Rect, Render};
+use crate::tui::{rect::Bottom, Frame, Rect, Render, Text};
 
 /// Placeholder struct for the whole editor.
 #[derive(Debug, Default)]
@@ -13,6 +13,12 @@ pub struct Editor {
     status_bar: StatusBar,
     /// The region of the terminal where the editing actually takes place.
     edit_area: EditArea,
+}
+
+impl Editor {
+    pub fn push(&mut self, c: char) {
+        self.edit_area.push(c);
+    }
 }
 
 impl Render for Editor {
@@ -41,9 +47,32 @@ impl Render for StatusBar {
 }
 
 /// The area where the editing happens.
-#[derive(Debug, Default)]
-struct EditArea {}
+#[derive(Debug)]
+struct EditArea {
+    lines: Vec<String>,
+}
+
+impl Default for EditArea {
+    fn default() -> Self {
+        Self {
+            lines: vec![String::new()],
+        }
+    }
+}
+
+impl EditArea {
+    fn push(&mut self, c: char) {
+        if c == '\n' {
+            self.lines.push(String::new());
+        } else {
+            self.lines.last_mut().unwrap().push(c);
+        }
+    }
+}
 
 impl Render for EditArea {
-    fn render(&self, frame: &mut Frame, region: Rect) {}
+    fn render(&self, frame: &mut Frame, region: Rect) {
+        let text = Text::from(self.lines.as_slice());
+        frame.render(&text, region);
+    }
 }
