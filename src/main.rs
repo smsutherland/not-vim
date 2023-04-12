@@ -8,6 +8,7 @@
 //! I'm just messing around trying to make my own editor because learning vimscript or lua is too
 //! much work. ¯\\_(ツ)_/¯
 
+use args::Args;
 use crossterm::{
     event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
@@ -16,17 +17,20 @@ use crossterm::{
 use std::io;
 use tui::Terminal;
 
+mod args;
 mod editor;
 mod tui;
 
 fn main() -> io::Result<()> {
+    let args = Args::parse_args();
+
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
 
     let mut term = Terminal::new();
 
-    let mut editor = editor::Editor::default();
+    let mut editor = editor::Editor::open(&args.file)?;
 
     loop {
         term.resize();
@@ -38,20 +42,31 @@ fn main() -> io::Result<()> {
             if !matches!(event.kind, KeyEventKind::Press | KeyEventKind::Repeat) {
                 continue;
             }
-            if let KeyEvent {
-                code: KeyCode::Char('q'),
-                modifiers: KeyModifiers::CONTROL,
-                ..
-            } = event
-            {
-                break;
+
+            if event.modifiers == KeyModifiers::CONTROL {
+                match event.code {
+                    KeyCode::Char('q') => {
+                        break;
+                    }
+                    KeyCode::Char('w') => {
+                        editor.write()?;
+                        continue;
+                    }
+                    _ => {}
+                }
             }
 
-            if let KeyCode::Char(c) = event.code {
-                editor.push(c);
-            }
-            if let KeyCode::Enter = event.code {
-                editor.push('\n');
+            match event.code {
+                KeyCode::Char(c) => {
+                    editor.push(c);
+                }
+                KeyCode::Enter => {
+                    editor.push('\n');
+                }
+                KeyCode::Backspace => {
+                    editor.backspace();
+                }
+                _ => (),
             }
         }
     }

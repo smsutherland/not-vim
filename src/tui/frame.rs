@@ -19,10 +19,12 @@ impl Frame<'_> {
     pub fn set_char(&mut self, c: char, x: u16, y: u16) {
         // Should these panic or should the function return a Result?
         if x >= self.buffer.area.width {
-            todo!("panic message");
+            return;
+            // todo!("panic message");
         }
         if y >= self.buffer.area.height {
-            todo!("panic message");
+            return;
+            // todo!("panic message");
         }
 
         let i = x as usize + self.buffer.area.width as usize * y as usize;

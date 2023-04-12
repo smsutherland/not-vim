@@ -4,6 +4,8 @@
 //! Right now this is only the [`Editor`] itself and the [`StatusBar`].
 //! These are only placeholder structs currently.
 
+use std::io;
+
 use crate::tui::{rect::Bottom, Frame, Rect, Render, Text};
 
 /// Placeholder struct for the whole editor.
@@ -13,12 +15,34 @@ pub struct Editor {
     status_bar: StatusBar,
     /// The region of the terminal where the editing actually takes place.
     edit_area: EditArea,
+    /// The file being operated on.
+    file: String,
 }
 
 impl Editor {
     /// Append a single character to the editing area.
     pub fn push(&mut self, c: char) {
         self.edit_area.push(c);
+    }
+
+    pub fn backspace(&mut self) {
+        self.edit_area.backspace();
+    }
+
+    pub fn open(fname: &str) -> io::Result<Self> {
+        let file = std::fs::read_to_string(fname)?;
+        Ok(Self {
+            status_bar: StatusBar {},
+            edit_area: EditArea {
+                lines: file.lines().map(ToOwned::to_owned).collect(),
+            },
+            file: fname.into(),
+        })
+    }
+
+    pub fn write(&self) -> io::Result<()> {
+        std::fs::write(&self.file, self.edit_area.to_string())?;
+        Ok(())
     }
 }
 
@@ -68,9 +92,25 @@ impl EditArea {
         if c == '\n' {
             self.lines.push(String::new());
         } else {
-            // TODO: robust handling of an empty file.
-            self.lines.last_mut().unwrap().push(c);
+            match self.lines.last_mut() {
+                Some(last_line) => last_line.push(c),
+                None => self.lines.push(String::from(c)),
+            }
         }
+    }
+
+    fn backspace(&mut self) {
+        if let Some(line) = self.lines.last_mut() {
+            if !line.is_empty() {
+                line.pop();
+            } else {
+                self.lines.pop();
+            }
+        }
+    }
+
+    fn to_string(&self) -> String {
+        self.lines.join("\n")
     }
 }
 
