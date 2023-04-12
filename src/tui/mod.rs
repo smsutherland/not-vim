@@ -1,12 +1,12 @@
 //! Here's all the code for abstracting a terminal.
 //!
-//! Contains information about [Buffer]s and individual [Cell]s.
+//! Contains information about [`Buffer`]s and individual [`Cell`]s.
 
 mod frame;
 pub mod rect;
 mod text;
 
-use crossterm::{cursor::MoveTo, execute, queue, style::Print};
+use crossterm::{cursor::MoveTo, queue, style::Print};
 pub use frame::Frame;
 pub use rect::Rect;
 use std::io::{self, Stdout, Write};
@@ -25,20 +25,20 @@ impl Default for Cell {
     }
 }
 
-/// A buffer of [Cell]s.
+/// A buffer of [`Cell`]s.
 ///
 /// Represents the content of a region of the terminal.
 #[derive(Debug, Clone)]
 struct Buffer {
-    /// All the [Cell]s of the buffer, stored in row-major order.
+    /// All the [`Cell`]s of the buffer, stored in row-major order.
     content: Vec<Cell>,
-    /// The area the [Buffer] is representing.
+    /// The area the [`Buffer`] is representing.
     area: Rect,
 }
 
 impl Buffer {
-    /// Takes another [Buffer] and returns a vector of all the [Cell]s which are different between
-    /// `self` and the other [Buffer].
+    /// Takes another [`Buffer`] and returns a vector of all the [`Cell`]s which are different between
+    /// `self` and the other [`Buffer`].
     ///
     /// This vector also contains the positions of the cells.
     fn diff(&self, other: &Self) -> Vec<(Cell, u16, u16)> {
@@ -57,7 +57,7 @@ impl Buffer {
 
     /// Resizes a buffer to match the area of `new_area`.
     ///
-    /// This will truncate any [Cell]s which fall outside of the region and will insert blank cells
+    /// This will truncate any [`Cell`]s which fall outside of the region and will insert blank cells
     /// if the new area is larger than the previous area.
     fn resize(&mut self, new_area: Rect) {
         self.area = new_area;
@@ -68,7 +68,7 @@ impl Buffer {
     }
 }
 
-/// Take a vector of Cells and enumerate them with their 2d coordinates.
+/// Take a vector of [`Cell`]s and enumerate them with their 2d coordinates.
 ///
 /// The coordinates are found by mapping the vector in a row-major fashion to the area described by
 /// `area`.
@@ -112,7 +112,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
-    /// Create a Terminal around Stdout.
+    /// Create a Terminal around [`Stdout`].
     pub fn new() -> Self {
         Self {
             buffers: [Buffer::default(), Buffer::default()],
@@ -121,9 +121,9 @@ impl Terminal {
         }
     }
 
-    /// Write the contents of the current [Buffer] to the terminal.
+    /// Write the contents of the current [`Buffer`] to the terminal.
     ///
-    /// This will draw the current [Buffer], then swap the current and back buffers.
+    /// This will draw the current [`Buffer`], then swap the current and back buffers.
     /// The new current buffer is made into a copy of the new back buffer (the one which just got
     /// drawn to the terminal).
     fn flush(&mut self) -> io::Result<()> {
@@ -144,46 +144,46 @@ impl Terminal {
         Ok(())
     }
 
-    /// Set the symbol at index `i` to `c`.
-    pub fn set(&mut self, c: char, i: usize) {
-        self.current_buf_mut().content[i] = Cell { symbol: c }
-    }
+    // /// Set the symbol at index `i` to `c`.
+    // pub fn set(&mut self, c: char, i: usize) {
+    //     self.current_buf_mut().content[i] = Cell { symbol: c }
+    // }
+    //
+    // /// Move the cursor to the position represented by the index `i`.
+    // pub fn set_cursor(&mut self, i: usize) -> io::Result<()> {
+    //     execute!(
+    //         self.stdout,
+    //         MoveTo(
+    //             (i % self.buffers[self.current_buf].area.width as usize) as u16,
+    //             (i / self.buffers[self.current_buf].area.width as usize) as u16,
+    //         )
+    //     )?;
+    //     Ok(())
+    // }
 
-    /// Move the cursor to the position represented by the index `i`.
-    pub fn set_cursor(&mut self, i: usize) -> io::Result<()> {
-        execute!(
-            self.stdout,
-            MoveTo(
-                (i % self.buffers[self.current_buf].area.width as usize) as u16,
-                (i / self.buffers[self.current_buf].area.width as usize) as u16,
-            )
-        )?;
-        Ok(())
-    }
-
-    /// Resize the Terminal to reflect the actual size of the terminal.
+    /// Resize the [`Terminal`] to reflect the actual size of the terminal.
     pub fn resize(&mut self) {
         let area = Rect::get_size();
         self.current_buf_mut().resize(area);
     }
 
-    /// Get a reference to the [Buffer] currently being written to.
+    /// Get a reference to the [`Buffer`] currently being written to.
     fn current_buf(&self) -> &Buffer {
         &self.buffers[self.current_buf]
     }
 
-    /// Get a reference to the [Buffer] currently being displayed in the terminal.
+    /// Get a reference to the [`Buffer`] currently being displayed in the terminal.
     fn display_buf(&self) -> &Buffer {
         &self.buffers[1 - self.current_buf]
     }
 
-    /// Get a mutable reference to the [Buffer] currently being written to.
+    /// Get a mutable reference to the [`Buffer`] currently being written to.
     fn current_buf_mut(&mut self) -> &mut Buffer {
         &mut self.buffers[self.current_buf]
     }
 
-    // /// Get a mutable reference to the [Buffer] currently being displayed in the terminal.
-    // /// This function does not exist because the display [Buffer] shouldn't be modified.
+    // /// Get a mutable reference to the [`Buffer`] currently being displayed in the terminal.
+    // /// This function does not exist because the display [`Buffer`] shouldn't be modified.
     // fn display_buf_mut(&mut self) -> &mut Buffer {
     //     &mut self.buffers[1 - self.current_buf]
     // }
@@ -198,13 +198,13 @@ impl Terminal {
     }
 }
 
-/// Take a [Frame] and draw to its underlying [Buffer].
+/// Take a [`Frame`] and draw to its underlying [`Buffer`].
 ///
-/// This is currently achieved by mainly using the [Frame::set_char] method, which allows you to,
-/// one character at a time, draw out the content being displayed. [Frame::render] can be called to
+/// This is currently achieved by mainly using the [`Frame::set_char`] method, which allows you to,
+/// one character at a time, draw out the content being displayed. [`Frame::render`] can be called to
 /// draw other objects implimenting [Render].
 ///
-/// Example implimentation of [Render] on [String]:
+/// Example implimentation of [`Render`] on [`String`]:
 /// ```
 /// impl Render for String {
 ///     fn render(&self, frame: &mut Frame) -> io::Result<()> {
@@ -216,6 +216,6 @@ impl Terminal {
 /// }
 /// ```
 pub trait Render {
-    /// Take a [Frame] and draw to its underlying [Buffer].
+    /// Take a [`Frame`] and draw to its underlying [`Buffer`].
     fn render(&self, frame: &mut Frame, region: Rect);
 }

@@ -1,6 +1,13 @@
+//! [`Text`] can be drawn to the terminal here.
+//!
+//! TODO: more robust handling of multiline strings.
+//! TODO: stylized strings.
+
 use super::{Frame, Rect, Render};
 
+/// A piece of text which can be drawn to the terminal.
 pub struct Text {
+    /// The content of the [`Text`].
     text: String,
 }
 

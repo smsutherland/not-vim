@@ -1,7 +1,7 @@
-//! All the code relating to the [Editor] lives here.
+//! All the code relating to the [`Editor`] lives here.
 //!
 //! This includes all the components of the view of an editor.
-//! Right now this is only the [Editor] itself and the [StatusLine].
+//! Right now this is only the [`Editor`] itself and the [`StatusBar`].
 //! These are only placeholder structs currently.
 
 use crate::tui::{rect::Bottom, Frame, Rect, Render, Text};
@@ -16,6 +16,7 @@ pub struct Editor {
 }
 
 impl Editor {
+    /// Append a single character to the editing area.
     pub fn push(&mut self, c: char) {
         self.edit_area.push(c);
     }
@@ -49,6 +50,7 @@ impl Render for StatusBar {
 /// The area where the editing happens.
 #[derive(Debug)]
 struct EditArea {
+    /// All the individual lines in the [`EditArea`].
     lines: Vec<String>,
 }
 
@@ -61,10 +63,12 @@ impl Default for EditArea {
 }
 
 impl EditArea {
+    /// Append a single character to the editing area.
     fn push(&mut self, c: char) {
         if c == '\n' {
             self.lines.push(String::new());
         } else {
+            // TODO: robust handling of an empty file.
             self.lines.last_mut().unwrap().push(c);
         }
     }

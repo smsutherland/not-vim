@@ -1,15 +1,15 @@
-//! A [Frame] represents a single region of a terminal which can be drawn to.
+//! A [`Frame`] represents a single region of a terminal which can be drawn to.
 
 use super::{Buffer, Rect, Render};
 
-/// An abstraction around drawing to a region of a [Buffer].
+/// An abstraction around drawing to a region of a [`Buffer`].
 pub struct Frame<'a> {
-    /// The underlying [Buffer] being drawn to.
+    /// The underlying [`Buffer`] being drawn to.
     pub(super) buffer: &'a mut Buffer,
 }
 
 impl Frame<'_> {
-    /// Draw a [Render]able item to the [Frame].
+    /// Draw a [`Render`]able item to the [`Frame`].
     #[inline]
     pub fn render(&mut self, item: &impl Render, region: Rect) {
         item.render(self, region);
@@ -29,11 +29,12 @@ impl Frame<'_> {
         self.buffer.content[i].symbol = c;
     }
 
+    /// Get the [`Rect`] representing the size of the [`Buffer`] being written to.
     pub fn size(&self) -> Rect {
         self.buffer.area
     }
 
-    /// Clear the whole underlying buffer in the region specified.
+    /// Clear the whole underlying [`Buffer`] in the region specified.
     pub fn clear(&mut self) {
         self.buffer.content.fill_with(Default::default);
     }
