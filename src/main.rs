@@ -19,6 +19,7 @@ use tui::Terminal;
 
 mod args;
 mod editor;
+mod editor_view;
 mod tui;
 
 fn main() -> io::Result<()> {
@@ -35,7 +36,7 @@ fn main() -> io::Result<()> {
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&editor, f.size());
+            f.render(&editor_view::Editor::from(&editor), f.size());
         })?;
 
         if let Event::Key(event) = read()? {
