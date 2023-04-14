@@ -70,6 +70,18 @@ fn main() -> io::Result<()> {
                 KeyCode::Backspace => {
                     editor.backspace();
                 }
+                KeyCode::Left => {
+                    editor.move_left();
+                }
+                KeyCode::Right => {
+                    editor.move_right();
+                }
+                KeyCode::Up => {
+                    editor.move_up();
+                }
+                KeyCode::Down => {
+                    editor.move_down();
+                }
                 _ => (),
             }
         }

@@ -16,25 +16,29 @@ pub struct Editor {
 impl Editor {
     /// Append a single character to the [`Editor`].
     pub fn push(&mut self, c: char) {
-        if c == '\n' {
-            self.lines.push(String::new());
-        } else {
-            match self.lines.last_mut() {
-                Some(last_line) => last_line.push(c),
-                None => self.lines.push(String::from(c)),
-            }
-        }
+        let (x, y) = self.cursor_pos;
+        let (x, y) = (x as usize, y as usize);
+        let line = self
+            .lines
+            .get_mut(y)
+            .expect("Cursor was on a line which doesn't exist!");
+        line.insert(x, c);
+        self.cursor_pos.0 += 1;
     }
 
     /// Remove the last character in the [`Editor`].
     pub fn backspace(&mut self) {
-        if let Some(line) = self.lines.last_mut() {
-            if !line.is_empty() {
-                line.pop();
-            } else {
-                self.lines.pop();
-            }
+        let (x, y) = self.cursor_pos;
+        if x == 0 {
+            return;
         }
+        let (x, y) = (x as usize, y as usize);
+        let line = self
+            .lines
+            .get_mut(y)
+            .expect("Cursor was on a line which doesn't exist!");
+        line.remove(x - 1);
+        self.cursor_pos.0 -= 1;
     }
 
     /// Open a file and read its contents to the buffer.
@@ -61,6 +65,24 @@ impl Editor {
     /// Returns the cursor pos of this [`Editor`].
     pub fn cursor_pos(&self) -> (u16, u16) {
         self.cursor_pos
+    }
+
+    pub fn move_left(&mut self) {
+        if self.cursor_pos.0 != 0 {
+            self.cursor_pos.0 -= 1;
+        }
+    }
+
+    pub fn move_right(&mut self) {
+        self.cursor_pos.0 += 1;
+    }
+
+    pub fn move_down(&mut self) {
+        self.cursor_pos.1 += 1;
+    }
+
+    pub fn move_up(&mut self) {
+        self.cursor_pos.1 -= 1;
     }
 }
 
