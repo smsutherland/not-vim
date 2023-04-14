@@ -131,13 +131,17 @@ impl Terminal {
     /// This will draw the current [`Buffer`], then swap the current and back buffers.
     /// The new current buffer is made into a copy of the new back buffer (the one which just got
     /// drawn to the terminal).
-    fn flush(&mut self) -> io::Result<()> {
+    fn flush(&mut self, final_position: Option<(u16, u16)>) -> io::Result<()> {
         let diff = self.current_buf().diff(self.display_buf());
 
         for (cell, x, y) in diff {
             // potential optimization: don't queue a MoveTo if the previous character was right
             // before this one.
             queue!(self.stdout, MoveTo(x, y), Print(cell.symbol))?;
+        }
+
+        if let Some((x, y)) = final_position {
+            queue!(self.stdout, MoveTo(x, y))?;
         }
 
         self.stdout.flush()?;
@@ -195,12 +199,15 @@ impl Terminal {
 
     // Concise description stolen from tui.
     /// Synchronizes terminal size, calls the rendering closure, flushes the current internal state and prepares for the next draw call.
-    pub fn draw(&mut self, draw: impl Fn(&mut Frame)) -> io::Result<()> {
+    ///
+    /// If the return value is [`Some`], then this will set the position of the cursor to the
+    /// returned coordinates.
+    pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> Option<(u16, u16)>) -> io::Result<()> {
         self.current_buf_mut().clear();
-        draw(&mut Frame {
+        let final_position = draw(&mut Frame {
             buffer: self.current_buf_mut(),
         });
-        self.flush()
+        self.flush(final_position)
     }
 }
 

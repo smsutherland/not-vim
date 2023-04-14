@@ -14,6 +14,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use editor_view::Editor as EditorView;
 use std::io;
 use tui::Terminal;
 
@@ -36,7 +37,9 @@ fn main() -> io::Result<()> {
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&editor_view::Editor::from(&editor), f.size());
+            let editor_view = EditorView::from(&editor);
+            f.render(&editor_view, f.size());
+            Some(editor_view.cursor_pos())
         })?;
 
         if let Event::Key(event) = read()? {

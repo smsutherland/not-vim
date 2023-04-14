@@ -9,6 +9,8 @@ pub struct Editor {
     lines: Vec<String>,
     /// The file being operated on.
     file: String,
+    /// Current position of the cursor
+    cursor_pos: (u16, u16),
 }
 
 impl Editor {
@@ -41,6 +43,7 @@ impl Editor {
         Ok(Self {
             lines: file.lines().map(ToOwned::to_owned).collect(),
             file: fname.into(),
+            cursor_pos: (0, 0),
         })
     }
 
@@ -54,7 +57,13 @@ impl Editor {
     pub fn lines(&self) -> &[String] {
         self.lines.as_ref()
     }
+
+    /// Returns the cursor pos of this [`Editor`].
+    pub fn cursor_pos(&self) -> (u16, u16) {
+        self.cursor_pos
+    }
 }
+
 impl ToString for Editor {
     fn to_string(&self) -> String {
         self.lines.join("\n")

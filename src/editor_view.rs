@@ -2,6 +2,8 @@
 //!
 //! [`Editor`]: EditorInternal
 
+use std::ops::Deref;
+
 use crate::{
     editor::Editor as EditorInternal,
     tui::{rect::Bottom, Frame, Rect, Render, Text},
@@ -17,6 +19,13 @@ pub struct Editor<'a> {
     status_bar: StatusBar,
     /// The main section showing the editing region.
     edit_area: EditArea<'a>,
+}
+
+impl Editor<'_> {
+    /// Returns the cursor pos of this [`Editor`].
+    pub fn cursor_pos(&self) -> (u16, u16) {
+        self.edit_area.cursor_pos()
+    }
 }
 
 impl<'a> From<&'a EditorInternal> for Editor<'a> {
@@ -46,6 +55,14 @@ struct EditArea<'a> {
     ///
     /// [`Editor`]: EditorInternal
     editor: &'a EditorInternal,
+}
+
+impl Deref for EditArea<'_> {
+    type Target = EditorInternal;
+
+    fn deref(&self) -> &Self::Target {
+        self.editor
+    }
 }
 
 impl Render for EditArea<'_> {
