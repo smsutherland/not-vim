@@ -66,6 +66,11 @@ impl Buffer {
             Cell::default(),
         );
     }
+
+    /// Fill the entire buffer with blank spaces.
+    fn clear(&mut self) {
+        self.content.fill_with(Cell::default);
+    }
 }
 
 /// Take a vector of [`Cell`]s and enumerate them with their 2d coordinates.
@@ -191,6 +196,7 @@ impl Terminal {
     // Concise description stolen from tui.
     /// Synchronizes terminal size, calls the rendering closure, flushes the current internal state and prepares for the next draw call.
     pub fn draw(&mut self, draw: impl Fn(&mut Frame)) -> io::Result<()> {
+        self.current_buf_mut().clear();
         draw(&mut Frame {
             buffer: self.current_buf_mut(),
         });

@@ -35,9 +35,4 @@ impl Frame<'_> {
     pub fn size(&self) -> Rect {
         self.buffer.area
     }
-
-    /// Clear the whole underlying [`Buffer`] in the region specified.
-    pub fn clear(&mut self) {
-        self.buffer.content.fill_with(Default::default);
-    }
 }

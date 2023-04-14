@@ -30,7 +30,6 @@ impl<'a> From<&'a EditorInternal> for Editor<'a> {
 
 impl Render for Editor<'_> {
     fn render(&self, frame: &mut Frame, region: Rect) {
-        frame.clear();
         let regions = region.partition(Bottom);
         let bottom_bar = regions[0];
         let editor_area = regions[1];
