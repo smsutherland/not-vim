@@ -15,6 +15,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use editor_view::Editor as EditorView;
+use gag::Hold;
 use std::io;
 use tui::Terminal;
 
@@ -23,12 +24,22 @@ mod editor;
 mod editor_view;
 mod tui;
 
+struct AlternateScreenGuard;
+
+impl Drop for AlternateScreenGuard {
+    fn drop(&mut self) {
+        let _ = execute!(io::stdout(), LeaveAlternateScreen);
+    }
+}
+
 fn main() -> io::Result<()> {
     let args = Args::parse_args();
 
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
+    let _stderr_hold = Hold::stderr()?;
+    let _asg = AlternateScreenGuard;
 
     let mut term = Terminal::new();
 
@@ -88,7 +99,7 @@ fn main() -> io::Result<()> {
     }
 
     disable_raw_mode()?;
-    execute!(io::stdout(), LeaveAlternateScreen)?;
+    // execute!(io::stdout(), LeaveAlternateScreen)?;
 
     Ok(())
 }
