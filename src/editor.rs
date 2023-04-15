@@ -90,6 +90,9 @@ impl Editor {
     /// If the line below is shorter than where the cursor currently is, the cursor will move back
     /// to the end of the line.
     pub fn move_down(&mut self) {
+        if self.cursor_pos.1 == self.lines.len() - 1 {
+            return;
+        }
         self.cursor_pos.1 += 1;
         if self.cursor_pos.0 > self.lines[self.cursor_pos.1].len() {
             self.cursor_pos.0 = self.lines[self.cursor_pos.1].len();
