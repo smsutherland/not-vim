@@ -24,6 +24,10 @@ mod editor;
 mod editor_view;
 mod tui;
 
+/// Unit struct which, when dropped, executes LeaveAlternateScreen on stdout.
+///
+/// This exists so in the event of a panic, drop is still called for this and we will still leave
+/// the alternate screen.
 struct AlternateScreenGuard;
 
 impl Drop for AlternateScreenGuard {
@@ -99,6 +103,7 @@ fn main() -> io::Result<()> {
     }
 
     disable_raw_mode()?;
+    // Not needed because of AlternateScreenGuard.
     // execute!(io::stdout(), LeaveAlternateScreen)?;
 
     Ok(())

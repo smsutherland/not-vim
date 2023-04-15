@@ -65,18 +65,30 @@ impl Editor {
         self.cursor_pos
     }
 
+    /// Move the cursor left by one character.
+    ///
+    /// Does not move the cursor beyond the end of the line.
+    /// Will not wrap to the previous line if the cursor is at the start of a line.
     pub fn move_left(&mut self) {
         if self.cursor_pos.0 != 0 {
             self.cursor_pos.0 -= 1;
         }
     }
 
+    /// Move the cursor right by one character.
+    ///
+    /// Does not move the cursor beyond the end of the line.
+    /// Will not wrap to the previous line if the cursor is at the end of a line.
     pub fn move_right(&mut self) {
         if self.cursor_pos.0 < self.lines[self.cursor_pos.1].len() {
             self.cursor_pos.0 += 1;
         }
     }
 
+    /// Move the cursor down by one line.
+    ///
+    /// If the line below is shorter than where the cursor currently is, the cursor will move back
+    /// to the end of the line.
     pub fn move_down(&mut self) {
         self.cursor_pos.1 += 1;
         if self.cursor_pos.0 > self.lines[self.cursor_pos.1].len() {
@@ -84,6 +96,10 @@ impl Editor {
         }
     }
 
+    /// Move the cursor up by one line.
+    ///
+    /// If the line above is shorter than where the cursor currently is, the cursor will move back
+    /// to the end of the line.
     pub fn move_up(&mut self) {
         if self.cursor_pos.1 != 0 {
             self.cursor_pos.1 -= 1;
