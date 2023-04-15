@@ -39,6 +39,15 @@ impl Editor {
         self.cursor_pos.0 -= 1;
     }
 
+    /// Adds a new line where the cursor is.
+    pub fn newline(&mut self) {
+        let (x, y) = self.cursor_pos;
+        let new_text = self.lines[y][x..].to_owned();
+        self.lines[y].truncate(x);
+        self.lines.insert(y + 1, new_text);
+        self.cursor_pos = (0, y + 1);
+    }
+
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> io::Result<Self> {
         let file = std::fs::read_to_string(fname)?;

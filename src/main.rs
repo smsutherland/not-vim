@@ -80,7 +80,7 @@ fn main() -> io::Result<()> {
                     editor.push(c);
                 }
                 KeyCode::Enter => {
-                    editor.push('\n');
+                    editor.newline();
                 }
                 KeyCode::Backspace => {
                     editor.backspace();
