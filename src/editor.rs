@@ -10,14 +10,13 @@ pub struct Editor {
     /// The file being operated on.
     file: String,
     /// Current position of the cursor
-    cursor_pos: (u16, u16),
+    cursor_pos: (usize, usize),
 }
 
 impl Editor {
     /// Append a single character to the [`Editor`].
     pub fn push(&mut self, c: char) {
         let (x, y) = self.cursor_pos;
-        let (x, y) = (x as usize, y as usize);
         let line = self
             .lines
             .get_mut(y)
@@ -32,7 +31,6 @@ impl Editor {
         if x == 0 {
             return;
         }
-        let (x, y) = (x as usize, y as usize);
         let line = self
             .lines
             .get_mut(y)
@@ -63,7 +61,7 @@ impl Editor {
     }
 
     /// Returns the cursor pos of this [`Editor`].
-    pub fn cursor_pos(&self) -> (u16, u16) {
+    pub fn cursor_pos(&self) -> (usize, usize) {
         self.cursor_pos
     }
 
@@ -74,15 +72,25 @@ impl Editor {
     }
 
     pub fn move_right(&mut self) {
-        self.cursor_pos.0 += 1;
+        if self.cursor_pos.0 < self.lines[self.cursor_pos.1].len() {
+            self.cursor_pos.0 += 1;
+        }
     }
 
     pub fn move_down(&mut self) {
         self.cursor_pos.1 += 1;
+        if self.cursor_pos.0 > self.lines[self.cursor_pos.1].len() {
+            self.cursor_pos.0 = self.lines[self.cursor_pos.1].len();
+        }
     }
 
     pub fn move_up(&mut self) {
-        self.cursor_pos.1 -= 1;
+        if self.cursor_pos.1 != 0 {
+            self.cursor_pos.1 -= 1;
+            if self.cursor_pos.0 > self.lines[self.cursor_pos.1].len() {
+                self.cursor_pos.0 = self.lines[self.cursor_pos.1].len();
+            }
+        }
     }
 }
 

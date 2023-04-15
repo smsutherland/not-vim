@@ -24,7 +24,8 @@ pub struct Editor<'a> {
 impl Editor<'_> {
     /// Returns the cursor pos of this [`Editor`].
     pub fn cursor_pos(&self) -> (u16, u16) {
-        self.edit_area.cursor_pos()
+        let (x, y) = self.edit_area.cursor_pos();
+        (x as u16, y as u16)
     }
 }
 
