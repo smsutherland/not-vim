@@ -29,6 +29,12 @@ impl Editor {
     pub fn backspace(&mut self) {
         let (x, y) = self.cursor_pos;
         if x == 0 {
+            if y != 0 {
+                let original_len = self.lines[y - 1].len();
+                let extra_line = self.lines.remove(y);
+                self.lines[y - 1].push_str(&extra_line);
+                self.cursor_pos = (original_len, y - 1)
+            }
             return;
         }
         let line = self
