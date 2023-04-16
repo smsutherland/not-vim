@@ -32,7 +32,9 @@ impl Editor<'_> {
 impl<'a> From<&'a EditorInternal> for Editor<'a> {
     fn from(value: &'a EditorInternal) -> Self {
         Self {
-            status_bar: StatusBar {},
+            status_bar: StatusBar {
+                position: value.cursor_pos(),
+            },
             edit_area: EditArea { editor: value },
         }
     }
@@ -75,7 +77,10 @@ impl Render for EditArea<'_> {
 
 /// Placeholder struct for the bottom status bar of the editor.
 #[derive(Debug, Default)]
-struct StatusBar {}
+struct StatusBar {
+    /// The position in the file (row, column); zero-indexed.
+    position: (usize, usize),
+}
 
 impl Render for StatusBar {
     fn render(&self, frame: &mut Frame, region: Rect) {
