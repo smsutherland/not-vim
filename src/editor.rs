@@ -1,6 +1,8 @@
 //! All the code relating to the [`Editor`] lives here.
 
-use std::io;
+use std::io::Read;
+
+use anyhow::Context;
 
 /// Placeholder struct for the whole editor.
 #[derive(Debug, Default)]
@@ -55,17 +57,21 @@ impl Editor {
     }
 
     /// Open a file and read its contents to the buffer.
-    pub fn open(fname: &str) -> io::Result<Self> {
-        let file = std::fs::read_to_string(fname)?;
+    pub fn open(fname: &str) -> anyhow::Result<Self> {
+        let mut file = std::fs::File::open(fname)
+            .with_context(|| format!("Opening file `{fname}` failed."))?;
+        let mut buf = String::new();
+        file.read_to_string(&mut buf)
+            .with_context(|| format!("Could not read file `{fname}` to string"))?;
         Ok(Self {
-            lines: file.lines().map(ToOwned::to_owned).collect(),
+            lines: buf.lines().map(ToOwned::to_owned).collect(),
             file: fname.into(),
             cursor_pos: (0, 0),
         })
     }
 
     /// Write the current contents of the buffer to the file it came from.
-    pub fn write(&self) -> io::Result<()> {
+    pub fn write(&self) -> anyhow::Result<()> {
         std::fs::write(&self.file, self.to_string())?;
         Ok(())
     }

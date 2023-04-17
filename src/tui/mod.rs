@@ -131,7 +131,7 @@ impl Terminal {
     /// This will draw the current [`Buffer`], then swap the current and back buffers.
     /// The new current buffer is made into a copy of the new back buffer (the one which just got
     /// drawn to the terminal).
-    fn flush(&mut self, final_position: Option<(u16, u16)>) -> io::Result<()> {
+    fn flush(&mut self, final_position: Option<(u16, u16)>) -> anyhow::Result<()> {
         let diff = self.current_buf().diff(self.display_buf());
 
         for (cell, x, y) in diff {
@@ -159,7 +159,7 @@ impl Terminal {
     // }
     //
     // /// Move the cursor to the position represented by the index `i`.
-    // pub fn set_cursor(&mut self, i: usize) -> io::Result<()> {
+    // pub fn set_cursor(&mut self, i: usize) -> anyhow::Result<()> {
     //     execute!(
     //         self.stdout,
     //         MoveTo(
@@ -202,7 +202,7 @@ impl Terminal {
     ///
     /// If the return value is [`Some`], then this will set the position of the cursor to the
     /// returned coordinates.
-    pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> Option<(u16, u16)>) -> io::Result<()> {
+    pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> Option<(u16, u16)>) -> anyhow::Result<()> {
         self.current_buf_mut().clear();
         let final_position = draw(&mut Frame {
             buffer: self.current_buf_mut(),
@@ -220,7 +220,7 @@ impl Terminal {
 /// Example implimentation of [`Render`] on [`String`]:
 /// ```
 /// impl Render for String {
-///     fn render(&self, frame: &mut Frame) -> io::Result<()> {
+///     fn render(&self, frame: &mut Frame) -> anyhow::Result<()> {
 ///         for (i, c) in self.chars().enumerate() {
 ///             frame.set_char(c, i, 0);
 ///         }

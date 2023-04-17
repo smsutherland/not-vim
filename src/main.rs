@@ -8,6 +8,7 @@
 //! I'm just messing around trying to make my own editor because learning vimscript or lua is too
 //! much work. ¯\\_(ツ)_/¯
 
+use anyhow::Context;
 use args::Args;
 use crossterm::{
     event::{read, Event, KeyCode, KeyEventKind, KeyModifiers},
@@ -32,22 +33,24 @@ struct AlternateScreenGuard;
 
 impl Drop for AlternateScreenGuard {
     fn drop(&mut self) {
+        let _ = disable_raw_mode();
         let _ = execute!(io::stdout(), LeaveAlternateScreen);
     }
 }
 
-fn main() -> io::Result<()> {
-    let args = Args::parse_args();
+fn main() -> anyhow::Result<()> {
+    let args = Args::parse_args().context("Could not parse command line arguments")?;
 
-    enable_raw_mode()?;
+    enable_raw_mode().context("Failed to enter raw mode.")?;
     let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen)?;
-    let _stderr_hold = Hold::stderr()?;
+    execute!(stdout, EnterAlternateScreen).context("Failed to enter alternate screen")?;
+    let _stderr_hold = Hold::stderr().context("Failed to obtain hold on stderr")?;
     let _asg = AlternateScreenGuard;
 
     let mut term = Terminal::new();
 
-    let mut editor = editor::Editor::open(&args.file)?;
+    let mut editor = editor::Editor::open(&args.file)
+        .context("Could not create an editor from the file given")?;
 
     loop {
         term.resize();
@@ -57,7 +60,7 @@ fn main() -> io::Result<()> {
             Some(editor_view.cursor_pos())
         })?;
 
-        if let Event::Key(event) = read()? {
+        if let Event::Key(event) = read().context("Could not read an event from the terminal")? {
             if !matches!(event.kind, KeyEventKind::Press | KeyEventKind::Repeat) {
                 continue;
             }
@@ -68,7 +71,9 @@ fn main() -> io::Result<()> {
                         break;
                     }
                     KeyCode::Char('w') => {
-                        editor.write()?;
+                        editor
+                            .write()
+                            .with_context(|| format!("Could not write to file {}", args.file))?;
                         continue;
                     }
                     _ => {}
@@ -102,8 +107,8 @@ fn main() -> io::Result<()> {
         }
     }
 
-    disable_raw_mode()?;
     // Not needed because of AlternateScreenGuard.
+    // disable_raw_mode().context("Failed to leave raw mode")?;
     // execute!(io::stdout(), LeaveAlternateScreen)?;
 
     Ok(())
