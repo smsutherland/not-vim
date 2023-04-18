@@ -88,7 +88,7 @@ impl Render for StatusBar {
         for x in 0..region.width {
             frame.set_char('█', x, bottom);
         }
-        let position = format!("{:?}", self.position);
+        let position = format!("{}:{}", self.position.1 + 1, self.position.0 + 1);
         for (x, c) in position.chars().enumerate() {
             frame.set_char(c, region.width - 15 + x as u16, bottom)
         }
