@@ -27,3 +27,30 @@ impl<'a> From<&'a [String]> for Text<'a> {
         Self { lines: value }
     }
 }
+
+/// A *single-line* piece of text which can be drawn to the terminal.
+pub struct SingleText<'a> {
+    /// The single line of text.
+    ///
+    /// Guaranteed to have no newlines in it.
+    text: &'a str,
+}
+
+impl<'a> From<&'a String> for SingleText<'a> {
+    fn from(value: &'a String) -> Self {
+        Self {
+            text: match value.find('\n') {
+                Some(index) => &value[..index],
+                None => value.as_str(),
+            },
+        }
+    }
+}
+
+impl Render for SingleText<'_> {
+    fn render(&self, frame: &mut Frame, region: Rect) {
+        for (x, c) in self.text.chars().enumerate() {
+            frame.set_char(c, x as u16 + region.left, region.top);
+        }
+    }
+}
