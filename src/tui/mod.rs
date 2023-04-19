@@ -6,22 +6,27 @@ mod frame;
 pub mod rect;
 mod text;
 
+pub use crossterm::style::Color;
 use crossterm::{cursor::MoveTo, queue, style::Print};
 pub use frame::Frame;
 pub use rect::Rect;
 use std::io::{self, Stdout, Write};
-pub use text::Text;
+pub use text::{Style, Text};
 
 /// All the information regarding the content of a single cell of a terminal.
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Cell {
     /// Which character is at this location.
     symbol: char,
+    style: Style,
 }
 
 impl Default for Cell {
     fn default() -> Self {
-        Self { symbol: ' ' }
+        Self {
+            symbol: ' ',
+            style: Style::default(),
+        }
     }
 }
 
@@ -134,10 +139,14 @@ impl Terminal {
     fn flush(&mut self, final_position: Option<(u16, u16)>) -> anyhow::Result<()> {
         let diff = self.current_buf().diff(self.display_buf());
 
+        let mut prev_style = Style::default();
+
         for (cell, x, y) in diff {
             // potential optimization: don't queue a MoveTo if the previous character was right
             // before this one.
-            queue!(self.stdout, MoveTo(x, y), Print(cell.symbol))?;
+            let style_diff = prev_style.diff(cell.style);
+            prev_style = cell.style;
+            queue!(self.stdout, MoveTo(x, y), style_diff, Print(cell.symbol))?;
         }
 
         if let Some((x, y)) = final_position {

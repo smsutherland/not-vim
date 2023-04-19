@@ -1,4 +1,5 @@
 #![warn(missing_docs)]
+#![warn(missing_debug_implementations)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::unnecessary_wraps)]

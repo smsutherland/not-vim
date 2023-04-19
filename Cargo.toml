@@ -18,6 +18,7 @@ path = "src/main.rs"
 crossterm = "0.26"
 gag = "1"
 anyhow = "1"
+bitflags = "2"
 
 [profile.opt]
 inherits = "release"

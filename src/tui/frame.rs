@@ -1,6 +1,6 @@
 //! A [`Frame`] represents a single region of a terminal which can be drawn to.
 
-use super::{Buffer, Rect, Render};
+use super::{Buffer, Rect, Render, Style};
 
 /// An abstraction around drawing to a region of a [`Buffer`].
 pub struct Frame<'a> {
@@ -34,5 +34,14 @@ impl Frame<'_> {
     /// Get the [`Rect`] representing the size of the [`Buffer`] being written to.
     pub fn size(&self) -> Rect {
         self.buffer.area
+    }
+
+    pub fn set_style(&mut self, style: Style, region: Rect) {
+        for y in region.top..region.top + region.height {
+            for x in region.left..region.left + region.width {
+                let i = x as usize + self.buffer.area.width as usize * y as usize;
+                self.buffer.content[i].style = style;
+            }
+        }
     }
 }
