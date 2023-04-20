@@ -18,6 +18,7 @@ pub use text::{Modifier, Style, Text};
 struct Cell {
     /// Which character is at this location.
     symbol: char,
+    /// [`Style`] of the character.
     style: Style,
 }
 

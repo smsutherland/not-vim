@@ -60,29 +60,66 @@ impl Render for SingleText<'_> {
     }
 }
 
+/// Represents the style a [`Cell`] can have.
+/// Includes a foreground and background [`Color`]s as well as any [`Modifier`]s applied.
+///
+/// [`Style`]s have a builder-like pattern for construction. For example, to create a [`Style`] with a foreground color of red which is underlined and bolded:
+/// ```
+/// let style = Style::default()
+///     .fg(Color::Red)
+///     .add_modifier(Modifier::UNDERLINED)
+///     .add_modifier(Modifier::BOLD);
+/// ```
+///
+/// Because [`Modifier`]s are [`bitflags`], This can be compacted slightly to be:
+/// ```
+/// let style = Style::default()
+///     .fg(Color::Red)
+///     .add_modifier(Modifier::UNDERLINED | Modifier::BOLD);
+/// ```
+/// 
+/// When using a [`Frame`] to render, use the [`set_style`] method to set the style of a region of the [`Buffer`]
+/// 
+/// [`Cell`]: super::Cell
+/// [`bitflags`]: ::bitflags
+/// [`set_style`]: Frame::set_style
+/// [`Buffer`]: super::Buffer
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Style {
+    /// The foreground [`Color`].
     fg: Color,
+    /// The background [`Color`].
     bg: Color,
+    /// Which [`Modifier`]s are active for this [`Style`].
     modifiers: Modifier,
 }
 
 impl Style {
+    /// Set the foreground color of the [`Style`].
+    ///
+    /// Returns Self to allow method chaining.
     pub fn fg(mut self, color: Color) -> Self {
         self.fg = color;
         self
     }
 
+    /// Set the background color of the [`Style`].
+    ///
+    /// Returns Self to allow method chaining.
     pub fn bg(mut self, color: Color) -> Self {
         self.bg = color;
         self
     }
 
+    /// Take self and add a [`Modifier`] on to it.
+    ///
+    /// Returns Self to allow method chaining.
     pub fn add_modifier(mut self, modifier: Modifier) -> Self {
         self.modifiers |= modifier;
         self
     }
 
+    /// Find the [`StyleChange`] required to move from `prev_style` to `self`.
     pub fn diff(&self, prev_style: Self) -> StyleChange {
         StyleChange {
             fg: if self.fg != prev_style.fg {
@@ -111,15 +148,27 @@ impl Default for Style {
     }
 }
 
+/// Represents a _change_ in the style of the terminal.
 #[derive(Debug, Clone, Copy)]
 pub struct StyleChange {
+    /// If the foreground color needs to change, it is specified here as `Some(Color)`. If no
+    /// foreground change is needed, this is `None`.
     fg: Option<Color>,
+    /// If the background color needs to change, it is specified here as `Some(Color)`. If no
+    /// background change is needed, this is `None`.
     bg: Option<Color>,
+    /// Set of [`Modifier`]s which are being added in this style change.
     add_modifier: Modifier,
+    /// Set of [`Modifier`]s which are being removed in this style change.
     sub_modifier: Modifier,
 }
 
 bitflags! {
+    /// Set of all possible modifiers the terminal can put on a [`Cell`].
+    ///
+    /// TODO: determine which ones are not used because bitflags forces it to `allow(dead_code)`.
+    ///
+    /// [`Cell`]: super::Cell
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub struct Modifier: u16 {
         const BOLD        = 0b0000_0000_0001;

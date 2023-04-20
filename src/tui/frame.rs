@@ -36,6 +36,9 @@ impl Frame<'_> {
         self.buffer.area
     }
 
+    /// Set the [`Style`] of all the [`Cell`]s in the underlying [`Buffer`] in the region specified.
+    ///
+    /// [`Cell`]: super::Cell
     pub fn set_style(&mut self, style: Style, region: Rect) {
         for y in region.top..region.top + region.height {
             for x in region.left..region.left + region.width {
