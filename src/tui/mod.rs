@@ -11,7 +11,7 @@ use crossterm::{cursor::MoveTo, queue, style::Print};
 pub use frame::Frame;
 pub use rect::Rect;
 use std::io::{self, Stdout, Write};
-pub use text::{Style, Text};
+pub use text::{Modifier, Style, Text};
 
 /// All the information regarding the content of a single cell of a terminal.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -144,7 +144,7 @@ impl Terminal {
         for (cell, x, y) in diff {
             // potential optimization: don't queue a MoveTo if the previous character was right
             // before this one.
-            let style_diff = prev_style.diff(cell.style);
+            let style_diff = cell.style.diff(prev_style);
             prev_style = cell.style;
             queue!(self.stdout, MoveTo(x, y), style_diff, Print(cell.symbol))?;
         }
@@ -152,6 +152,8 @@ impl Terminal {
         if let Some((x, y)) = final_position {
             queue!(self.stdout, MoveTo(x, y))?;
         }
+        // reset the style
+        queue!(self.stdout, Style::default().diff(prev_style))?;
 
         self.stdout.flush()?;
 
