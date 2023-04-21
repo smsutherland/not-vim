@@ -77,9 +77,9 @@ impl Render for SingleText<'_> {
 ///     .fg(Color::Red)
 ///     .add_modifier(Modifier::UNDERLINED | Modifier::BOLD);
 /// ```
-/// 
+///
 /// When using a [`Frame`] to render, use the [`set_style`] method to set the style of a region of the [`Buffer`]
-/// 
+///
 /// [`Cell`]: super::Cell
 /// [`bitflags`]: ::bitflags
 /// [`set_style`]: Frame::set_style
@@ -239,6 +239,67 @@ impl Command for StyleChange {
         }
         if self.add_modifier.contains(Modifier::RAPID_BLINK) {
             SetAttribute(Attribute::RapidBlink).write_ansi(f)?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(windows)]
+    fn execute_winapi(&self) -> crossterm::Result<()> {
+        if let Some(fg) = self.fg {
+            SetForegroundColor(fg).execute_winapi()?;
+        }
+        if let Some(bg) = self.bg {
+            SetBackgroundColor(bg).execute_winapi()?;
+        }
+
+        if self.sub_modifier.contains(Modifier::REVERSED) {
+            SetAttribute(Attribute::NoReverse).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::BOLD) {
+            SetAttribute(Attribute::NormalIntensity).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::ITALIC) {
+            SetAttribute(Attribute::NoItalic).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::UNDERLINED) {
+            SetAttribute(Attribute::NoUnderline).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::DIM) {
+            SetAttribute(Attribute::NormalIntensity).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::CROSSED_OUT) {
+            SetAttribute(Attribute::NotCrossedOut).execute_winapi()?;
+        }
+        if self.sub_modifier.contains(Modifier::SLOW_BLINK)
+            || self.sub_modifier.contains(Modifier::RAPID_BLINK)
+        {
+            SetAttribute(Attribute::NoBlink).execute_winapi()?;
+        }
+
+        if self.add_modifier.contains(Modifier::REVERSED) {
+            SetAttribute(Attribute::Reverse).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::BOLD) {
+            SetAttribute(Attribute::Bold).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::ITALIC) {
+            SetAttribute(Attribute::Italic).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::UNDERLINED) {
+            SetAttribute(Attribute::Underlined).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::DIM) {
+            SetAttribute(Attribute::Dim).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::CROSSED_OUT) {
+            SetAttribute(Attribute::CrossedOut).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::SLOW_BLINK) {
+            SetAttribute(Attribute::SlowBlink).execute_winapi()?;
+        }
+        if self.add_modifier.contains(Modifier::RAPID_BLINK) {
+            SetAttribute(Attribute::RapidBlink).execute_winapi()?;
         }
 
         Ok(())
