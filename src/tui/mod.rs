@@ -10,7 +10,7 @@ pub use crossterm::style::Color;
 use crossterm::{cursor::MoveTo, queue, style::Print};
 pub use frame::Frame;
 pub use rect::Rect;
-use std::io::{self, Stdout, Write};
+use std::io::{self, StdoutLock, Write};
 pub use text::{Modifier, Style, Text};
 
 /// All the information regarding the content of a single cell of a terminal.
@@ -118,8 +118,7 @@ pub struct Terminal {
     /// The `1 - current_buf` is currently being displayed.
     current_buf: usize,
     /// The writer being used to write the editor to.
-    // TODO: Should this be a StdoutLock?
-    stdout: Stdout,
+    stdout: StdoutLock<'static>,
 }
 
 impl Terminal {
@@ -128,7 +127,7 @@ impl Terminal {
         Self {
             buffers: [Buffer::default(), Buffer::default()],
             current_buf: 0,
-            stdout: io::stdout(),
+            stdout: io::stdout().lock(),
         }
     }
 
