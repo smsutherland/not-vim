@@ -141,8 +141,8 @@ impl Style {
 impl Default for Style {
     fn default() -> Self {
         Self {
-            fg: Color::White,
-            bg: Color::Black,
+            fg: Color::Reset,
+            bg: Color::Reset,
             modifiers: Modifier::empty(),
         }
     }
