@@ -58,7 +58,7 @@ fn main() -> anyhow::Result<()> {
         term.draw(|f| {
             let editor_view = EditorView::from(&editor);
             f.render(&editor_view, f.size());
-            Some(editor_view.cursor_pos())
+            Some(editor_view.selected_pos())
         })?;
 
         if let Event::Key(event) = read().context("Could not read an event from the terminal")? {

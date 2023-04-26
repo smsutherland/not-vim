@@ -23,8 +23,8 @@ pub struct Editor<'a> {
 
 impl Editor<'_> {
     /// Returns the cursor pos of this [`Editor`].
-    pub fn cursor_pos(&self) -> (u16, u16) {
-        let (x, y) = self.edit_area.cursor_pos();
+    pub fn selected_pos(&self) -> (u16, u16) {
+        let (x, y) = self.edit_area.selected_pos();
         (x as u16, y as u16)
     }
 }
@@ -33,7 +33,7 @@ impl<'a> From<&'a EditorInternal> for Editor<'a> {
     fn from(value: &'a EditorInternal) -> Self {
         Self {
             status_bar: StatusBar {
-                position: value.cursor_pos(),
+                position: value.selected_pos(),
             },
             edit_area: EditArea { editor: value },
         }
