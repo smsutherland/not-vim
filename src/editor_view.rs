@@ -6,7 +6,7 @@ use std::ops::Deref;
 
 use crate::{
     editor::Editor as EditorInternal,
-    tui::{rect::Bottom, Color, Frame, Modifier, Rect, Render, Style, Text},
+    tui::{rect::Bottom, Color, Frame, Rect, Render, Style, Text},
 };
 
 /// An [`Editor`] which can be [`Render`]ed.
@@ -85,13 +85,7 @@ struct StatusBar {
 impl Render for StatusBar {
     fn render(&self, frame: &mut Frame, region: Rect) {
         let bottom = region.top + region.height - 1;
-        frame.set_style(
-            Style::default()
-                .fg(Color::Black)
-                .bg(Color::DarkRed)
-                .add_modifier(Modifier::CROSSED_OUT),
-            region,
-        );
+        frame.set_style(Style::default().fg(Color::Black).bg(Color::White), region);
         let position = format!("{}:{}", self.position.1 + 1, self.position.0 + 1);
         for (x, c) in position.chars().enumerate() {
             frame.set_char(c, region.width - 15 + x as u16, bottom)
