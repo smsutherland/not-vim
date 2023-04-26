@@ -122,7 +122,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
-    /// Create a Terminal around [`Stdout`].
+    /// Create a Terminal around standard out.
     pub fn new() -> Self {
         Self {
             buffers: [Buffer::default(), Buffer::default()],

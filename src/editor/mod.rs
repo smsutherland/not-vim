@@ -5,13 +5,26 @@ use std::collections::BTreeMap;
 
 mod buffer;
 
+/// Documents are indexed by a unique usize.
 type DocumentID = usize;
 
-/// Placeholder struct for the whole editor.
+/// The main editor struct.
+///
+/// This has all the buffers loaded, as well as information about the cursor and which buffer is
+/// selected.
 #[derive(Debug, Default)]
 pub struct Editor {
+    /// All the buffers in the editor.
     buffers: BTreeMap<DocumentID, Buffer>,
+    /// Which of the buffers is currently selected.
+    ///
+    /// This is a key into [`buffers`].
+    ///
+    /// [`buffers`]: Self::buffers
     selected_buf: DocumentID,
+    /// The position of the cursor, in (x, y) format.
+    ///
+    /// This is a position in the buffer, not necessarilly on the screen.
     selected_pos: (usize, usize),
 }
 

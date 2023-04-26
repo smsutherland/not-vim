@@ -20,6 +20,7 @@ pub struct Buffer {
 }
 
 impl Buffer {
+    /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let mut file = std::fs::File::open(fname)
             .with_context(|| format!("Opening file `{fname}` failed."))?;
@@ -32,7 +33,7 @@ impl Buffer {
         })
     }
 
-    /// Append a single character to the [`EditorView`].
+    /// Append a single character to the [`Buffer`] at the provided coordinates.
     pub fn push(&mut self, c: char, (x, y): &mut (usize, usize)) {
         let line = self
             .lines
@@ -42,7 +43,7 @@ impl Buffer {
         *x += 1;
     }
 
-    /// Remove the last character in the [`EditorView`].
+    /// Remove the character in the [`Buffer`] right before the provided coordinates.
     pub fn backspace(&mut self, (x, y): &mut (usize, usize)) {
         if *x == 0 {
             if *y != 0 {
@@ -63,6 +64,8 @@ impl Buffer {
     }
 
     /// Adds a new line where the cursor is.
+    ///
+    /// This may split a line into two if the cursor is in the middle of a line.
     pub fn newline(&mut self, (x, y): &mut (usize, usize)) {
         let new_text = self.lines[*y][*x..].to_owned();
         self.lines[*y].truncate(*x);
@@ -79,7 +82,7 @@ impl Buffer {
         Ok(())
     }
 
-    /// Returns a reference to the lines of this [`Editor`].
+    /// Returns a reference to the lines of this [`Buffer`].
     pub fn lines(&self) -> &[String] {
         self.lines.as_ref()
     }
