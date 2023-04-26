@@ -140,13 +140,19 @@ impl Terminal {
         let diff = self.current_buf().diff(self.display_buf());
 
         let mut prev_style = Style::default();
+        let mut prev_position = None;
 
         for (cell, x, y) in diff {
-            // potential optimization: don't queue a MoveTo if the previous character was right
-            // before this one.
+            if prev_position
+                .map(|(old_x, old_y)| (x, y) != (old_x + 1, old_y))
+                .unwrap_or(true)
+            {
+                queue!(self.stdout, MoveTo(x, y))?;
+            }
+            prev_position = Some((x, y));
             let style_diff = cell.style.diff(prev_style);
             prev_style = cell.style;
-            queue!(self.stdout, MoveTo(x, y), style_diff, Print(cell.symbol))?;
+            queue!(self.stdout, style_diff, Print(cell.symbol))?;
         }
 
         if let Some((x, y)) = final_position {
