@@ -12,7 +12,7 @@
 use anyhow::Context;
 use args::Args;
 use crossterm::{
-    event::{read, Event, KeyCode, KeyEventKind, KeyModifiers},
+    event::{read, Event, KeyCode, KeyEventKind},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -22,6 +22,7 @@ use std::io;
 use tui::Terminal;
 
 mod args;
+mod config;
 mod editor;
 mod editor_view;
 mod tui;
@@ -66,44 +67,42 @@ fn main() -> anyhow::Result<()> {
                 continue;
             }
 
-            if event.modifiers == KeyModifiers::CONTROL {
-                match event.code {
-                    KeyCode::Char('q') => {
-                        break;
-                    }
-                    KeyCode::Char('w') => {
-                        editor
-                            .write()
-                            .with_context(|| format!("Could not write to file {}", args.file))?;
-                        continue;
-                    }
-                    _ => {}
+            match event.into() {
+                config::QUIT => {
+                    break;
                 }
-            }
-
-            match event.code {
-                KeyCode::Char(c) => {
-                    editor.push(c);
+                config::WRITE => {
+                    editor
+                        .write()
+                        .with_context(|| format!("Could not write to file {}", args.file))?;
+                    continue;
                 }
-                KeyCode::Enter => {
+                config::ENTER => {
                     editor.newline();
                 }
-                KeyCode::Backspace => {
+                config::BACKSPACE => {
                     editor.backspace();
                 }
-                KeyCode::Left => {
+                config::LEFT => {
                     editor.move_left();
                 }
-                KeyCode::Right => {
+                config::RIGHT => {
                     editor.move_right();
                 }
-                KeyCode::Up => {
+                config::UP => {
                     editor.move_up();
                 }
-                KeyCode::Down => {
+                config::DOWN => {
                     editor.move_down();
                 }
-                _ => (),
+                // any old letter
+                config::Key {
+                    code: KeyCode::Char(c),
+                    modifiers: config::KeyModifiers::NONE,
+                } => {
+                    editor.push(c);
+                }
+                _ => {}
             }
         }
     }
