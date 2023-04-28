@@ -16,7 +16,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use editor_view::Editor as EditorView;
+use editor_view::EditorView;
 use gag::Hold;
 use std::io;
 use tui::Terminal;
@@ -53,11 +53,12 @@ fn main() -> anyhow::Result<()> {
 
     let mut editor = editor::Editor::open(&args.file)
         .context("Could not create an editor from the file given")?;
+    let editor_view = EditorView::new();
 
     loop {
         term.resize();
         term.draw(|f| {
-            let editor_view = EditorView::from(&editor);
+            let editor_view = editor_view.with_editor(&editor);
             f.render(&editor_view, f.size());
             Some(editor_view.selected_pos())
         })?;
