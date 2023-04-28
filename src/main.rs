@@ -12,6 +12,7 @@
 use anyhow::Context;
 use args::Args;
 use crossterm::{
+    cursor::SetCursorStyle,
     event::{read, Event, KeyCode, KeyEventKind},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -36,7 +37,11 @@ struct AlternateScreenGuard;
 impl Drop for AlternateScreenGuard {
     fn drop(&mut self) {
         let _ = disable_raw_mode();
-        let _ = execute!(io::stdout(), LeaveAlternateScreen);
+        let _ = execute!(
+            io::stdout(),
+            LeaveAlternateScreen,
+            SetCursorStyle::DefaultUserShape
+        );
     }
 }
 
@@ -46,6 +51,7 @@ fn main() -> anyhow::Result<()> {
     enable_raw_mode().context("Failed to enter raw mode.")?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen).context("Failed to enter alternate screen")?;
+    execute!(stdout, SetCursorStyle::SteadyBlock).context("Failed to set cursor style")?;
     let _stderr_hold = Hold::stderr().context("Failed to obtain hold on stderr")?;
     let _asg = AlternateScreenGuard;
 
@@ -110,7 +116,11 @@ fn main() -> anyhow::Result<()> {
 
     // Not needed because of AlternateScreenGuard.
     // disable_raw_mode().context("Failed to leave raw mode")?;
-    // execute!(io::stdout(), LeaveAlternateScreen)?;
+    // execute!(
+    //     io::stdout(),
+    //     LeaveAlternateScreen,
+    //     SetCursorStyle::DefaultUserShape
+    // )?;
 
     Ok(())
 }
