@@ -19,6 +19,7 @@ crossterm = "0.26"
 gag = "1"
 anyhow = "1"
 bitflags = "2"
+ropey = "1.6.0"
 
 [profile.opt]
 inherits = "release"

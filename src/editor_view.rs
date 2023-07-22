@@ -87,7 +87,20 @@ impl Deref for EditArea<'_> {
 
 impl Render for EditArea<'_> {
     fn render(&self, frame: &mut Frame, region: Rect) {
-        let text = Text::from(self.editor.lines());
+        // TODO: This really needs to be redone
+        let lines: Vec<_> = self
+            .editor
+            .lines()
+            .map(|slice| {
+                let slice = slice;
+                if slice.len_chars() > 0 && slice.char(slice.len_chars() - 1) == '\n' {
+                    slice.slice(..slice.len_chars() - 1).to_string()
+                } else {
+                    slice.to_string()
+                }
+            })
+            .collect();
+        let text = Text::from(lines.as_ref());
         frame.render(&text, region);
     }
 }

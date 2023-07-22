@@ -1,6 +1,7 @@
 //! All the code relating to the [`Editor`] lives here.
 
 use buffer::Buffer;
+use ropey::iter::Lines;
 use std::collections::BTreeMap;
 
 mod buffer;
@@ -67,7 +68,7 @@ impl Editor {
     }
 
     /// Returns a reference to the lines of this [`Editor`].
-    pub fn lines(&self) -> &[String] {
+    pub fn lines(&self) -> Lines {
         self.buffers[&self.selected_buf].lines()
     }
 
@@ -91,7 +92,7 @@ impl Editor {
     /// Does not move the cursor beyond the end of the line.
     /// Will not wrap to the previous line if the cursor is at the end of a line.
     pub fn move_right(&mut self) {
-        if self.selected_pos.0 < self.lines()[self.selected_pos.1].len() {
+        if self.selected_pos.0 < self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
             self.selected_pos.0 += 1;
         }
     }
@@ -105,8 +106,8 @@ impl Editor {
             return;
         }
         self.selected_pos.1 += 1;
-        if self.selected_pos.0 > self.lines()[self.selected_pos.1].len() {
-            self.selected_pos.0 = self.lines()[self.selected_pos.1].len();
+        if self.selected_pos.0 > self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
+            self.selected_pos.0 = self.lines().nth(self.selected_pos.1).unwrap().len_chars();
         }
     }
 
@@ -117,8 +118,8 @@ impl Editor {
     pub fn move_up(&mut self) {
         if self.selected_pos.1 != 0 {
             self.selected_pos.1 -= 1;
-            if self.selected_pos.0 > self.lines()[self.selected_pos.1].len() {
-                self.selected_pos.0 = self.lines()[self.selected_pos.1].len();
+            if self.selected_pos.0 > self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
+                self.selected_pos.0 = self.lines().nth(self.selected_pos.1).unwrap().len_chars();
             }
         }
     }
