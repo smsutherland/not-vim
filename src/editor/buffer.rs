@@ -13,6 +13,7 @@ use ropey::{iter::Lines, Rope};
 /// [module]: self
 #[derive(Debug, Clone)]
 pub struct Buffer {
+    /// Text contents of the buffer represented by a [`Rope`].
     text: Rope,
     /// The path to the file on disk (if the buffer references one).
     file: Option<String>,
@@ -21,7 +22,7 @@ pub struct Buffer {
 impl Buffer {
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
-        let mut file = std::fs::File::open(fname)
+        let file = std::fs::File::open(fname)
             .with_context(|| format!("Opening file `{fname}` failed."))?;
         let rope = Rope::from_reader(file)?;
         Ok(Self {

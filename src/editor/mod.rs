@@ -92,7 +92,13 @@ impl Editor {
     /// Does not move the cursor beyond the end of the line.
     /// Will not wrap to the previous line if the cursor is at the end of a line.
     pub fn move_right(&mut self) {
-        if self.selected_pos.0 < self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
+        if self.selected_pos.0
+            < self
+                .lines()
+                .nth(self.selected_pos.1)
+                .expect("invalid selected position")
+                .len_chars()
+        {
             self.selected_pos.0 += 1;
         }
     }
@@ -106,8 +112,18 @@ impl Editor {
             return;
         }
         self.selected_pos.1 += 1;
-        if self.selected_pos.0 > self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
-            self.selected_pos.0 = self.lines().nth(self.selected_pos.1).unwrap().len_chars();
+        if self.selected_pos.0
+            > self
+                .lines()
+                .nth(self.selected_pos.1)
+                .expect("invalid selected position")
+                .len_chars()
+        {
+            self.selected_pos.0 = self
+                .lines()
+                .nth(self.selected_pos.1)
+                .expect("invalid selected position")
+                .len_chars();
         }
     }
 
@@ -118,8 +134,18 @@ impl Editor {
     pub fn move_up(&mut self) {
         if self.selected_pos.1 != 0 {
             self.selected_pos.1 -= 1;
-            if self.selected_pos.0 > self.lines().nth(self.selected_pos.1).unwrap().len_chars() {
-                self.selected_pos.0 = self.lines().nth(self.selected_pos.1).unwrap().len_chars();
+            if self.selected_pos.0
+                > self
+                    .lines()
+                    .nth(self.selected_pos.1)
+                    .expect("invalid selected position")
+                    .len_chars()
+            {
+                self.selected_pos.0 = self
+                    .lines()
+                    .nth(self.selected_pos.1)
+                    .expect("invalid selected position")
+                    .len_chars();
             }
         }
     }
