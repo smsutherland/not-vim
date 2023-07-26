@@ -1,7 +1,7 @@
 //! All the code relating to the [`Editor`] lives here.
 
 use buffer::Buffer;
-use ropey::iter::Lines;
+use ropey::{iter::Lines, RopeSlice};
 use std::collections::BTreeMap;
 
 mod buffer;
@@ -70,6 +70,11 @@ impl Editor {
     /// Returns a reference to the lines of this [`Editor`].
     pub fn lines(&self) -> Lines {
         self.buffers[&self.selected_buf].lines()
+    }
+
+    /// Returns a reference to the whole text of this [`Editor`].
+    pub fn text(&self) -> RopeSlice {
+        self.buffers[&self.selected_buf].text()
     }
 
     /// Returns the cursor pos of this [`Editor`].

@@ -5,7 +5,7 @@
 //! A buffer contains both the content of the buffer and the file which it refers to.
 
 use anyhow::Context;
-use ropey::{iter::Lines, Rope};
+use ropey::{iter::Lines, Rope, RopeSlice};
 
 /// A single buffer of text. May refer to a specific file or be a free-floating buffer.
 /// See the [module] level documentation for more.
@@ -77,5 +77,10 @@ impl Buffer {
     /// Returns a reference to the lines of this [`Buffer`].
     pub fn lines(&self) -> Lines {
         self.text.lines()
+    }
+
+    /// Returns a reference to all the text of this [`Buffer`].
+    pub fn text(&self) -> RopeSlice {
+        self.text.slice(..)
     }
 }

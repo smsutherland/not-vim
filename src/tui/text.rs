@@ -9,16 +9,38 @@ use crossterm::{
     style::{Attribute, Color, SetAttribute, SetBackgroundColor, SetForegroundColor},
     Command,
 };
+use ropey::RopeSlice;
 
 /// A piece of text which can be drawn to the terminal.
 pub struct Text<'a> {
     /// The content of the [`Text`].
-    lines: &'a [String],
+    text: RopeSlice<'a>,
 }
 
 impl Render for Text<'_> {
     fn render(&self, frame: &mut Frame, region: Rect) {
-        for (y, line) in self.lines.iter().take(region.height as usize).enumerate() {
+        for (y, line) in self.text.lines().take(region.height as usize).enumerate() {
+            // trim tailing newlines
+            let mut num_newline_chars = 0;
+            for c in line.chars_at(line.len_chars()).reversed() {
+                if matches!(
+                    c,
+                    '\u{000A}'|// Line Feed
+                    '\u{000D}'|// Carriage Return
+                    '\u{000B}'|// Vertical Tab
+                    '\u{000C}'|// Form Feed
+                    '\u{0085}'|// Next Line
+                    '\u{2028}'|// Line Separator
+                    '\u{2029}' // Paragraph Separator
+                ) {
+                    num_newline_chars += 1;
+                } else {
+                    break;
+                }
+            }
+            eprintln!("Num newline chars: {num_newline_chars}");
+            let line = line.slice(..line.len_chars() - num_newline_chars);
+
             for (x, c) in line.chars().take(region.width as usize).enumerate() {
                 let (x, y) = (x as u16, y as u16);
                 frame.set_char(c, x + region.left, y + region.top);
@@ -27,9 +49,12 @@ impl Render for Text<'_> {
     }
 }
 
-impl<'a> From<&'a [String]> for Text<'a> {
-    fn from(value: &'a [String]) -> Self {
-        Self { lines: value }
+impl<'a, T> From<T> for Text<'a>
+where
+    T: Into<RopeSlice<'a>>,
+{
+    fn from(value: T) -> Self {
+        Self { text: value.into() }
     }
 }
 
