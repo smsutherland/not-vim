@@ -3,6 +3,8 @@
 //! TODO: more robust handling of multiline strings.
 //! TODO: stylized strings.
 
+use crate::editor::trim_newlines;
+
 use super::{Frame, Rect, Render};
 use bitflags::bitflags;
 use crossterm::{
@@ -19,28 +21,13 @@ pub struct Text<'a> {
 
 impl Render for Text<'_> {
     fn render(&self, frame: &mut Frame, region: Rect) {
-        for (y, line) in self.text.lines().take(region.height as usize).enumerate() {
-            // trim tailing newlines
-            let mut num_newline_chars = 0;
-            for c in line.chars_at(line.len_chars()).reversed() {
-                if matches!(
-                    c,
-                    '\u{000A}'|// Line Feed
-                    '\u{000D}'|// Carriage Return
-                    '\u{000B}'|// Vertical Tab
-                    '\u{000C}'|// Form Feed
-                    '\u{0085}'|// Next Line
-                    '\u{2028}'|// Line Separator
-                    '\u{2029}' // Paragraph Separator
-                ) {
-                    num_newline_chars += 1;
-                } else {
-                    break;
-                }
-            }
-            eprintln!("Num newline chars: {num_newline_chars}");
-            let line = line.slice(..line.len_chars() - num_newline_chars);
-
+        for (y, line) in self
+            .text
+            .lines()
+            .take(region.height as usize)
+            .map(trim_newlines)
+            .enumerate()
+        {
             for (x, c) in line.chars().take(region.width as usize).enumerate() {
                 let (x, y) = (x as u16, y as u16);
                 frame.set_char(c, x + region.left, y + region.top);

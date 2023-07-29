@@ -98,11 +98,12 @@ impl Editor {
     /// Will not wrap to the previous line if the cursor is at the end of a line.
     pub fn move_right(&mut self) {
         if self.selected_pos.0
-            < self
-                .lines()
-                .nth(self.selected_pos.1)
-                .expect("invalid selected position")
-                .len_chars()
+            < trim_newlines(
+                self.lines()
+                    .nth(self.selected_pos.1)
+                    .expect("invalid selected position"),
+            )
+            .len_chars()
         {
             self.selected_pos.0 += 1;
         }
@@ -154,4 +155,31 @@ impl Editor {
             }
         }
     }
+}
+
+/// Remove the newline character(s) from the end of a [`RopeSlice`].
+///
+/// This is necessary because [`RopeSlice::lines`] includes the trailing newline characters.
+///
+/// [`RopeSlice`]: ropey::RopeSlice
+/// [`RopeSlice::lines`]: ropey::RopeSlice::lines
+pub fn trim_newlines(line: RopeSlice) -> RopeSlice {
+    let mut num_newline_chars = 0;
+    for c in line.chars_at(line.len_chars()).reversed() {
+        if matches!(
+            c,
+            '\u{000A}'|// Line Feed
+            '\u{000D}'|// Carriage Return
+            '\u{000B}'|// Vertical Tab
+            '\u{000C}'|// Form Feed
+            '\u{0085}'|// Next Line
+            '\u{2028}'|// Line Separator
+            '\u{2029}' // Paragraph Separator
+        ) {
+            num_newline_chars += 1;
+        } else {
+            break;
+        }
+    }
+    line.slice(..line.len_chars() - num_newline_chars)
 }

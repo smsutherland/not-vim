@@ -1,6 +1,4 @@
 //! Separates the mechanics of drawing an [`Editor`] from the internals of the editing itself.
-//!
-//! [`Editor`]: EditorInternal
 
 use std::ops::Deref;
 
@@ -10,8 +8,6 @@ use crate::{
 };
 
 /// An [`Editor`] which can be [`Render`]ed.
-///
-/// [`Editor`]: EditorInternal
 pub struct EditorView {}
 
 impl EditorView {
@@ -68,12 +64,8 @@ impl Render for EditorInitialized<'_, '_> {
 }
 
 /// Newtype around [`Editor`] to enable allow [`Render`]ing.
-///
-/// [`Editor`]: EditorInternal
 struct EditArea<'a> {
     /// The [`Editor`] being drawn.
-    ///
-    /// [`Editor`]: EditorInternal
     editor: &'a Editor,
 }
 
