@@ -6,24 +6,6 @@ pub use configurable::*;
 pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 pub use non_configurable::*;
 
-/// A keybind for a specific action.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Key {
-    /// Which key was pressed.
-    pub code: KeyCode,
-    /// Any modifiers on the pressed key.
-    pub modifiers: KeyModifiers,
-}
-
-impl From<KeyEvent> for Key {
-    fn from(value: KeyEvent) -> Self {
-        Self {
-            code: value.code,
-            modifiers: value.modifiers,
-        }
-    }
-}
-
 mod configurable {
     //! These are the keybinds which are worth configuring.
 
@@ -82,4 +64,22 @@ mod non_configurable {
         code: KeyCode::Down,
         modifiers: KeyModifiers::NONE,
     };
+}
+
+/// A keybind for a specific action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Key {
+    /// Which key was pressed.
+    pub code: KeyCode,
+    /// Any modifiers on the pressed key.
+    pub modifiers: KeyModifiers,
+}
+
+impl From<KeyEvent> for Key {
+    fn from(value: KeyEvent) -> Self {
+        Self {
+            code: value.code,
+            modifiers: value.modifiers,
+        }
+    }
 }
