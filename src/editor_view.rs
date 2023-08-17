@@ -79,7 +79,8 @@ impl Deref for EditArea<'_> {
 
 impl Render for EditArea<'_> {
     fn render(&self, frame: &mut Frame, region: Rect) {
-        let text = Text::from(self.editor.text());
+        let mut text = Text::from(self.editor.text());
+        text.wrap(crate::config::WRAP_MODE);
         frame.render(&text, region);
     }
 }

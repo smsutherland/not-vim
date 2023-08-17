@@ -3,7 +3,7 @@
 //! TODO: more robust handling of multiline strings.
 //! TODO: stylized strings.
 
-use crate::editor::trim_newlines;
+use crate::{config::WrapMode, editor::trim_newlines};
 
 use super::{Frame, Rect, Render};
 use bitflags::bitflags;
@@ -17,10 +17,24 @@ use ropey::RopeSlice;
 pub struct Text<'a> {
     /// The content of the [`Text`].
     text: RopeSlice<'a>,
+    /// How this box of text will wrap it's contents.
+    ///
+    /// See [`WrapMode`]. Defaults to [`WrapMode::NoWrap(None)`]
+    ///
+    /// [`WrapMode::NoWrap(None)`]: WrapMode::NoWrap
+    wrap_mode: WrapMode,
 }
 
-impl Render for Text<'_> {
-    fn render(&self, frame: &mut Frame, region: Rect) {
+impl<'a> Text<'a> {
+    /// Change how this box of text wraps.
+    ///
+    /// See [`WrapMode`].
+    pub fn wrap(&mut self, wrap_mode: WrapMode) {
+        self.wrap_mode = wrap_mode;
+    }
+
+    /// Renders the text in the case where `self.wrap_mode` is set to [`WrapMode::Wrap`].
+    fn render_no_wrap(&self, frame: &mut Frame, region: Rect) {
         for (y, line) in self
             .text
             .lines()
@@ -34,6 +48,67 @@ impl Render for Text<'_> {
             }
         }
     }
+
+    /// Renders the text in the case where `self.wrap_mode` is set to [`WrapMode::NoWrap(Some(c))`], where c is passed in as a parameter here.
+    ///
+    /// [`WrapMode::NoWrap(Some(c))`]: WrapMode::NoWrap
+    fn render_no_wrap_with_char(&self, frame: &mut Frame, region: Rect, c: char) {
+        for (y, line) in self
+            .text
+            .lines()
+            .take(region.height as usize)
+            .map(trim_newlines)
+            .enumerate()
+        {
+            for (x, c) in line.chars().take(region.width as usize).enumerate() {
+                let (x, y) = (x as u16, y as u16);
+                frame.set_char(c, x + region.left, y + region.top);
+            }
+            if line.len_chars() > region.width as usize {
+                frame.set_char(c, region.width - 1 + region.left, y as u16 + region.top);
+            }
+        }
+    }
+
+    /// Renders the text in the case where `self.wrap_mode` is set to [`WrapMode::NoWrap(None)`].
+    ///
+    /// [`WrapMode::NoWrap(None)`]: WrapMode::NoWrap
+    fn render_wrap(&self, frame: &mut Frame, region: Rect) {
+        let mut y = 0;
+
+        for line in self
+            .text
+            .lines()
+            .take(region.height as usize)
+            .map(trim_newlines)
+        {
+            let mut x = 0;
+            for c in line.chars() {
+                frame.set_char(c, x + region.left, y + region.top);
+
+                x += 1;
+                if x == region.width {
+                    x = 0;
+                    y += 1;
+                }
+            }
+
+            y += 1;
+            if y == region.height {
+                break;
+            }
+        }
+    }
+}
+
+impl Render for Text<'_> {
+    fn render(&self, frame: &mut Frame, region: Rect) {
+        match self.wrap_mode {
+            WrapMode::Wrap => self.render_wrap(frame, region),
+            WrapMode::NoWrap(Some(c)) => self.render_no_wrap_with_char(frame, region, c),
+            WrapMode::NoWrap(None) => self.render_no_wrap(frame, region),
+        }
+    }
 }
 
 impl<'a, T> From<T> for Text<'a>
@@ -41,7 +116,10 @@ where
     T: Into<RopeSlice<'a>>,
 {
     fn from(value: T) -> Self {
-        Self { text: value.into() }
+        Self {
+            text: value.into(),
+            wrap_mode: WrapMode::NoWrap(None),
+        }
     }
 }
 

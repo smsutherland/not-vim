@@ -22,6 +22,11 @@ mod configurable {
         code: KeyCode::Char('w'),
         modifiers: KeyModifiers::CONTROL,
     };
+
+    /// Determines how the main editor will handle lines longer than the width of the screen.
+    ///
+    /// See [`WrapMode`].
+    pub const WRAP_MODE: WrapMode = WrapMode::NoWrap(Some('>'));
 }
 
 mod non_configurable {
@@ -82,4 +87,17 @@ impl From<KeyEvent> for Key {
             modifiers: value.modifiers,
         }
     }
+}
+
+/// Enumeration of possible ways of handling lines which are longer than editor width.
+#[allow(dead_code)] // Only one variant will be used in the configuration.
+pub enum WrapMode {
+    /// Long lines will continue to the edge of the screen. Any excess gets displayed on the
+    /// next line. Note that this is only a display effect. No newlines are inserted when wrapping
+    /// text.
+    Wrap,
+    /// Long lines will cut off at the edge of the screen and the provided char will be placed at
+    /// the end to siginfy that the line continues off the screen. If the provided character is
+    /// [`None`] then nothing will be displayed to signify line continuance.
+    NoWrap(Option<char>),
 }
