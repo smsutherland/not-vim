@@ -52,6 +52,7 @@ fn main() {
     }
 }
 
+/// This is the main function which is extracted out for better error handling.
 #[wherr]
 fn try_main() -> anyhow::Result<()> {
     let args = Args::parse_args().context("Could not parse command line arguments")?;
