@@ -21,6 +21,7 @@ use editor_view::EditorView;
 use gag::Hold;
 use std::io;
 use tui::Terminal;
+use wherr::wherr;
 
 mod args;
 mod config;
@@ -45,7 +46,14 @@ impl Drop for AlternateScreenGuard {
     }
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() {
+    if let Err(err) = try_main() {
+        eprintln!("{err:#?}");
+    }
+}
+
+#[wherr]
+fn try_main() -> anyhow::Result<()> {
     let args = Args::parse_args().context("Could not parse command line arguments")?;
 
     enable_raw_mode().context("Failed to enter raw mode.")?;

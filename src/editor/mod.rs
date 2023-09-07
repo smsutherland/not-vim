@@ -3,6 +3,7 @@
 use buffer::Buffer;
 use ropey::{iter::Lines, RopeSlice};
 use std::collections::BTreeMap;
+use wherr::wherr;
 
 mod buffer;
 
@@ -31,6 +32,7 @@ pub struct Editor {
 
 impl Editor {
     /// Open a file and read its contents to the buffer.
+    #[wherr]
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let mut buffers = BTreeMap::new();
         buffers.insert(0, Buffer::open(fname)?);
@@ -63,6 +65,7 @@ impl Editor {
     }
 
     /// Write the current contents of the buffer to the file it came from.
+    #[wherr]
     pub fn write(&self) -> anyhow::Result<()> {
         self.buffers[&self.selected_buf].write()
     }
