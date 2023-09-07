@@ -21,7 +21,6 @@ use editor_view::EditorView;
 use gag::Hold;
 use std::io;
 use tui::Terminal;
-use wherr::wherr;
 
 mod args;
 mod config;
@@ -53,7 +52,6 @@ fn main() {
 }
 
 /// This is the main function which is extracted out for better error handling.
-#[wherr]
 fn try_main() -> anyhow::Result<()> {
     let args = Args::parse_args().context("Could not parse command line arguments")?;
 

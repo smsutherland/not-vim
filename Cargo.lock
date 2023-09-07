@@ -192,7 +192,6 @@ dependencies = [
  "crossterm",
  "gag",
  "ropey",
- "wherr",
 ]
 
 [[package]]
@@ -381,27 +380,6 @@ name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
-
-[[package]]
-name = "wherr"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1365fb436d5b1423abc7b2ce849d936cfa14673f87594c7dcf7bd2f33116aeeb"
-dependencies = [
- "anyhow",
- "wherr-macro",
-]
-
-[[package]]
-name = "wherr-macro"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcd9c173b9b815ff2031c9c356b74ba878d4293a383cec9a1e193033ecac3e18"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
 
 [[package]]
 name = "winapi"

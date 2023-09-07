@@ -20,7 +20,6 @@ gag = "1"
 anyhow = "1"
 bitflags = "2"
 ropey = "1.6.0"
-wherr = { version = "0.1.7", features = ["anyhow"] }
 
 [profile.opt]
 inherits = "release"

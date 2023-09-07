@@ -5,7 +5,6 @@
 
 use anyhow::bail;
 use std::env;
-use wherr::wherr;
 
 /// The command-line arguments passed into the program.
 pub struct Args {
@@ -15,7 +14,6 @@ pub struct Args {
 
 impl Args {
     /// Interpret the command-line arguments as an [`Args`].
-    #[wherr]
     pub fn parse_args() -> anyhow::Result<Self> {
         let mut args = env::args();
         args.next(); // skip program name

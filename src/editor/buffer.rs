@@ -6,7 +6,6 @@
 
 use anyhow::Context;
 use ropey::{iter::Lines, Rope, RopeSlice};
-use wherr::wherr;
 
 /// A single buffer of text. May refer to a specific file or be a free-floating buffer.
 /// See the [module] level documentation for more.
@@ -22,7 +21,6 @@ pub struct Buffer {
 
 impl Buffer {
     /// Open a file and read its contents to the buffer.
-    #[wherr]
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let file = std::fs::File::open(fname)
             .with_context(|| format!("Opening file `{fname}` failed."))?;
@@ -68,7 +66,6 @@ impl Buffer {
     }
 
     /// Write the current contents of the buffer to the file it came from.
-    #[wherr]
     pub fn write(&self) -> anyhow::Result<()> {
         if let Some(file) = &self.file {
             let file = std::fs::File::open(file)?;

@@ -12,7 +12,6 @@ pub use frame::Frame;
 pub use rect::Rect;
 use std::io::{self, StdoutLock, Write};
 pub use text::{Modifier, Style, Text};
-use wherr::wherr;
 
 /// All the information regarding the content of a single cell of a terminal.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -137,7 +136,6 @@ impl Terminal {
     /// This will draw the current [`Buffer`], then swap the current and back buffers.
     /// The new current buffer is made into a copy of the new back buffer (the one which just got
     /// drawn to the terminal).
-    #[wherr]
     fn flush(&mut self, final_position: Option<(u16, u16)>) -> anyhow::Result<()> {
         let diff = self.current_buf().diff(self.display_buf());
 
@@ -221,7 +219,6 @@ impl Terminal {
     ///
     /// If the return value is [`Some`], then this will set the position of the cursor to the
     /// returned coordinates.
-    #[wherr]
     pub fn draw(&mut self, draw: impl Fn(&mut Frame) -> Option<(u16, u16)>) -> anyhow::Result<()> {
         self.current_buf_mut().clear();
         let final_position = draw(&mut Frame {
