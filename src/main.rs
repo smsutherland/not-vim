@@ -11,9 +11,10 @@
 
 use anyhow::Context;
 use args::Args;
+use config::Message;
 use crossterm::{
     cursor::SetCursorStyle,
-    event::{read, Event, KeyCode, KeyEventKind},
+    event::{read, Event, KeyEventKind},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -66,7 +67,7 @@ fn try_main() -> anyhow::Result<()> {
 
     let mut editor = editor::Editor::open(&args.file)
         .context("Could not create an editor from the file given")?;
-    let editor_view = EditorView::new();
+    let mut editor_view = EditorView::new();
 
     loop {
         term.resize();
@@ -76,48 +77,32 @@ fn try_main() -> anyhow::Result<()> {
             Some(editor_view.selected_pos())
         })?;
 
-        if let Event::Key(event) = read().context("Could not read an event from the terminal")? {
-            if !matches!(event.kind, KeyEventKind::Press | KeyEventKind::Repeat) {
-                continue;
-            }
+        let Event::Key(event) = read().context("Could not read an event from the terminal")? else {
+            continue;
+        };
+        if !matches!(event.kind, KeyEventKind::Press | KeyEventKind::Repeat) {
+            continue;
+        }
 
-            match event.into() {
-                config::QUIT => {
-                    break;
-                }
-                config::WRITE => {
-                    editor
-                        .write()
-                        .with_context(|| format!("Could not write to file {}", args.file))?;
-                    continue;
-                }
-                config::ENTER => {
-                    editor.newline();
-                }
-                config::BACKSPACE => {
-                    editor.backspace();
-                }
-                config::LEFT => {
-                    editor.move_left();
-                }
-                config::RIGHT => {
-                    editor.move_right();
-                }
-                config::UP => {
-                    editor.move_up();
-                }
-                config::DOWN => {
-                    editor.move_down();
-                }
-                // any old letter
-                config::Key {
-                    code: KeyCode::Char(c),
-                    modifiers: config::KeyModifiers::NONE,
-                } => {
-                    editor.push(c);
-                }
-                _ => {}
+        let message = config::translate_event(editor_view.mode, event.into());
+        match message {
+            Message::Quit => {
+                break;
             }
+            Message::Write => {
+                editor
+                    .write()
+                    .with_context(|| format!("Could not write to file {}", args.file))?;
+            }
+            Message::Enter => editor.newline(),
+            Message::Backspace => editor.backspace(),
+            Message::Left => editor.move_left(),
+            Message::Right => editor.move_right(),
+            Message::Up => editor.move_up(),
+            Message::Down => editor.move_down(),
+            Message::Char(c) => editor.push(c),
+            Message::Mode(m) => editor_view.mode = m,
+            Message::None => {}
         }
     }
 

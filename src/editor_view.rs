@@ -8,12 +8,14 @@ use crate::{
 };
 
 /// An [`Editor`] which can be [`Render`]ed.
-pub struct EditorView {}
+pub struct EditorView {
+    pub mode: Mode,
+}
 
 impl EditorView {
     /// Creates a new [`EditorView`].
     pub fn new() -> Self {
-        Self {}
+        Self { mode: Mode::Normal }
     }
 
     /// Initializes the [`EditorView`] with an [`Editor`], allowing it to be [`Render`]ed.
@@ -101,4 +103,10 @@ impl Render for StatusBar {
             frame.set_char(c, region.width - 15 + x as u16, bottom)
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Mode {
+    Normal,
+    Insert,
 }

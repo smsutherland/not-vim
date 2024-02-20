@@ -2,74 +2,131 @@
 //!
 //! This includes things like keybinds for specific actions.
 
-pub use configurable::*;
 pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-pub use non_configurable::*;
 
-mod configurable {
-    //! These are the keybinds which are worth configuring.
+use crate::editor_view::Mode;
 
-    use super::*;
+pub fn translate_event(mode: Mode, key: Key) -> Message {
+    match mode {
+        Mode::Normal => normal_mode_event(key),
+        Mode::Insert => insert_mode_event(key),
+    }
+}
 
+fn normal_mode_event(key: Key) -> Message {
+    match key {
+        Key {
+            code: KeyCode::Char('q'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Quit,
+
+        Key {
+            code: KeyCode::Char('w'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Write,
+
+        Key {
+            code: KeyCode::Left | KeyCode::Char('h'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Left,
+
+        Key {
+            code: KeyCode::Right | KeyCode::Char('l'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Right,
+
+        Key {
+            code: KeyCode::Up | KeyCode::Char('k'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Up,
+
+        Key {
+            code: KeyCode::Down | KeyCode::Char('j'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Down,
+
+        Key {
+            code: KeyCode::Char('i'),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Mode(Mode::Insert),
+
+        _ => Message::None,
+    }
+}
+
+fn insert_mode_event(key: Key) -> Message {
+    match key {
+        Key {
+            code: KeyCode::Enter,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Enter,
+
+        Key {
+            code: KeyCode::Backspace,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Backspace,
+
+        Key {
+            code: KeyCode::Left,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Left,
+
+        Key {
+            code: KeyCode::Right,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Right,
+
+        Key {
+            code: KeyCode::Up,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Up,
+
+        Key {
+            code: KeyCode::Down,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Down,
+
+        Key {
+            code: KeyCode::Esc,
+            modifiers: KeyModifiers::NONE,
+        } => Message::Mode(Mode::Normal),
+
+        Key {
+            code: KeyCode::Char(c),
+            modifiers: KeyModifiers::NONE,
+        } => Message::Char(c),
+
+        _ => Message::None,
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Message {
     /// Quit the editor.
-    pub const QUIT: Key = Key {
-        code: KeyCode::Char('q'),
-        modifiers: KeyModifiers::CONTROL,
-    };
-
+    Quit,
     /// Write the current buffer to its file.
-    pub const WRITE: Key = Key {
-        code: KeyCode::Char('w'),
-        modifiers: KeyModifiers::CONTROL,
-    };
-
-    /// Determines how the main editor will handle lines longer than the width of the screen.
-    ///
-    /// See [`WrapMode`].
-    pub const WRAP_MODE: WrapMode = WrapMode::NoWrap(Some('>'));
-}
-
-mod non_configurable {
-    //! These are keybinds which really shouldn't be touched.
-
-    use super::*;
-
+    Write,
     /// Enter a newline.
-    pub const ENTER: Key = Key {
-        code: KeyCode::Enter,
-        modifiers: KeyModifiers::NONE,
-    };
-
+    Enter,
     /// Delete the character behind the cursor.
-    pub const BACKSPACE: Key = Key {
-        code: KeyCode::Backspace,
-        modifiers: KeyModifiers::NONE,
-    };
-
+    Backspace,
     /// Move the cursor left.
-    pub const LEFT: Key = Key {
-        code: KeyCode::Left,
-        modifiers: KeyModifiers::NONE,
-    };
-
+    Left,
     /// Move the cursor right.
-    pub const RIGHT: Key = Key {
-        code: KeyCode::Right,
-        modifiers: KeyModifiers::NONE,
-    };
-
+    Right,
     /// Move the cursor up.
-    pub const UP: Key = Key {
-        code: KeyCode::Up,
-        modifiers: KeyModifiers::NONE,
-    };
-
+    Up,
     /// Move the cursor down.
-    pub const DOWN: Key = Key {
-        code: KeyCode::Down,
-        modifiers: KeyModifiers::NONE,
-    };
+    Down,
+    /// Insert a character.
+    Char(char),
+    /// Enter a given [`Mode`].
+    Mode(Mode),
+    /// Do nothing.
+    None,
 }
+
+pub const WRAP_MODE: WrapMode = WrapMode::NoWrap(Some('>'));
 
 /// A keybind for a specific action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
