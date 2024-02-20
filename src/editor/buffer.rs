@@ -68,7 +68,12 @@ impl Buffer {
     /// Write the current contents of the buffer to the file it came from.
     pub fn write(&self) -> anyhow::Result<()> {
         if let Some(file) = &self.file {
-            let file = std::fs::File::open(file)?;
+            let file = std::fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .open(file)
+                .with_context(|| format!("Opening file `{file}` failed."))?;
             self.text.write_to(file)?;
         }
         Ok(())
