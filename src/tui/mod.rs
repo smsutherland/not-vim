@@ -11,7 +11,7 @@ use crossterm::{cursor::MoveTo, queue, style::Print};
 pub use frame::Frame;
 pub use rect::Rect;
 use std::io::{self, StdoutLock, Write};
-pub use text::{Modifier, Style, Text};
+pub use text::{Style, Text};
 
 /// All the information regarding the content of a single cell of a terminal.
 #[derive(Debug, Clone, Copy, PartialEq)]
