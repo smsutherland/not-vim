@@ -83,7 +83,7 @@ impl Buffer {
 ///
 /// The coordinates are found by mapping the vector in a row-major fashion to the area described by
 /// `area`.
-fn enumerate_2d(items: &Vec<Cell>, area: Rect) -> impl Iterator<Item = (Cell, u16, u16)> + '_ {
+fn enumerate_2d(items: &[Cell], area: Rect) -> impl Iterator<Item = (Cell, u16, u16)> + '_ {
     assert_eq!(
         items.len(),
         area.width as usize * area.height as usize,

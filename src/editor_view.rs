@@ -9,6 +9,7 @@ use crate::{
 
 /// An [`Editor`] which can be [`Render`]ed.
 pub struct EditorView {
+    /// Which [`Mode`] is the editor currently in.
     pub mode: Mode,
 }
 
@@ -105,8 +106,15 @@ impl Render for StatusBar {
     }
 }
 
+/// An enumeration of possible editor modes.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Mode {
+    /// Normal mode.
+    ///
+    /// This mode is mainly for navigation and editing text.
     Normal,
+    /// Insert mode.
+    ///
+    /// This mode is specifically for inserting text into the buffer.
     Insert,
 }

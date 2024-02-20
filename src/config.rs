@@ -6,6 +6,10 @@ pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::editor_view::Mode;
 
+/// Read an event and translate it into a [`Message`].
+///
+/// This provides an easily-configurable layer in which to transform from user events to actions
+/// for the editor.
 pub fn translate_event(mode: Mode, key: Key) -> Message {
     match mode {
         Mode::Normal => normal_mode_event(key),
@@ -13,6 +17,7 @@ pub fn translate_event(mode: Mode, key: Key) -> Message {
     }
 }
 
+/// Translate a [`KeyEvent`] into a [`Message`] for normal mode.
 fn normal_mode_event(key: Key) -> Message {
     match key {
         Key {
@@ -54,6 +59,7 @@ fn normal_mode_event(key: Key) -> Message {
     }
 }
 
+/// Translate a [`KeyEvent`] into a [`Message`] for insert mode.
 fn insert_mode_event(key: Key) -> Message {
     match key {
         Key {
@@ -100,6 +106,7 @@ fn insert_mode_event(key: Key) -> Message {
     }
 }
 
+/// An enumeration of all possible actions the editor could take.
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
     /// Quit the editor.
@@ -126,6 +133,7 @@ pub enum Message {
     None,
 }
 
+/// The configured wrap mode for the editor.
 pub const WRAP_MODE: WrapMode = WrapMode::NoWrap(Some('>'));
 
 /// A keybind for a specific action.
