@@ -101,7 +101,17 @@ fn try_main() -> anyhow::Result<()> {
             Message::Up => editor.move_up(),
             Message::Down => editor.move_down(),
             Message::Char(c) => editor.push(c),
-            Message::Mode(m) => editor_view.mode = m,
+            Message::Mode(m) => {
+                editor_view.mode = m;
+                match m {
+                    editor_view::Mode::Normal => {
+                        execute!(stdout, crossterm::cursor::SetCursorStyle::SteadyBlock)?
+                    }
+                    editor_view::Mode::Insert => {
+                        execute!(stdout, crossterm::cursor::SetCursorStyle::SteadyBar)?
+                    }
+                }
+            }
             Message::None => {}
         }
     }
