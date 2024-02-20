@@ -118,18 +118,15 @@ impl Editor {
             return;
         }
         self.selected_pos.1 += 1;
-        if self.selected_pos.0
-            > self
-                .lines()
+        let line_len = trim_newlines(
+            self.lines()
                 .nth(self.selected_pos.1)
-                .expect("invalid selected position")
-                .len_chars()
-        {
-            self.selected_pos.0 = self
-                .lines()
-                .nth(self.selected_pos.1)
-                .expect("invalid selected position")
-                .len_chars();
+                .expect("invalid selected position"),
+        )
+        .len_chars();
+
+        if self.selected_pos.0 > line_len {
+            self.selected_pos.0 = line_len;
         }
     }
 
@@ -140,18 +137,14 @@ impl Editor {
     pub fn move_up(&mut self) {
         if self.selected_pos.1 != 0 {
             self.selected_pos.1 -= 1;
-            if self.selected_pos.0
-                > self
-                    .lines()
+            let line_len = trim_newlines(
+                self.lines()
                     .nth(self.selected_pos.1)
-                    .expect("invalid selected position")
-                    .len_chars()
-            {
-                self.selected_pos.0 = self
-                    .lines()
-                    .nth(self.selected_pos.1)
-                    .expect("invalid selected position")
-                    .len_chars();
+                    .expect("invalid selected position"),
+            )
+            .len_chars();
+            if self.selected_pos.0 > line_len {
+                self.selected_pos.0 = line_len;
             }
         }
     }
