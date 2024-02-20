@@ -335,7 +335,7 @@ impl Command for StyleChange {
     }
 
     #[cfg(windows)]
-    fn execute_winapi(&self) -> crossterm::Result<()> {
+    fn execute_winapi(&self) -> std::io::Result<()> {
         if let Some(fg) = self.fg {
             SetForegroundColor(fg).execute_winapi()?;
         }
