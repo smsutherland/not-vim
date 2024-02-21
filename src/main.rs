@@ -18,6 +18,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use editor::Mode;
 use editor_view::EditorView;
 use gag::Hold;
 use std::io;
@@ -65,14 +66,13 @@ fn try_main() -> anyhow::Result<()> {
 
     let mut term = Terminal::new();
 
-    let mut editor = editor::Editor::open(&args.file)
+    let editor = editor::Editor::open(&args.file)
         .context("Could not create an editor from the file given")?;
-    let mut editor_view = EditorView::new();
+    let mut editor_view = EditorView::new(editor);
 
     loop {
         term.resize();
         term.draw(|f| {
-            let editor_view = editor_view.with_editor(&editor);
             f.render(&editor_view, f.size());
             Some(editor_view.selected_pos())
         })?;
@@ -84,32 +84,30 @@ fn try_main() -> anyhow::Result<()> {
             continue;
         }
 
-        let message = config::translate_event(editor_view.mode, event.into());
+        let message = config::translate_event(editor_view.editor.mode, event.into());
         match message {
             Message::Quit => {
                 break;
             }
             Message::Write => {
-                editor
+                editor_view
                     .write()
                     .with_context(|| format!("Could not write to file {}", args.file))?;
             }
-            Message::Enter => editor.newline(),
-            Message::Backspace => editor.backspace(),
-            Message::Left => editor.move_left(),
-            Message::Right => editor.move_right(),
-            Message::Up => editor.move_up(),
-            Message::Down => editor.move_down(),
-            Message::Char(c) => editor.push(c),
+            Message::Enter => editor_view.newline(),
+            Message::Backspace => editor_view.backspace(),
+            Message::Left => editor_view.move_left(),
+            Message::Right => editor_view.move_right(),
+            Message::Up => editor_view.move_up(),
+            Message::Down => editor_view.move_down(),
+            Message::Char(c) => editor_view.push(c),
             Message::Mode(m) => {
                 editor_view.mode = m;
                 match m {
-                    editor_view::Mode::Normal => {
+                    Mode::Normal => {
                         execute!(stdout, crossterm::cursor::SetCursorStyle::SteadyBlock)?
                     }
-                    editor_view::Mode::Insert => {
-                        execute!(stdout, crossterm::cursor::SetCursorStyle::SteadyBar)?
-                    }
+                    Mode::Insert => execute!(stdout, crossterm::cursor::SetCursorStyle::SteadyBar)?,
                 }
             }
             Message::None => {}

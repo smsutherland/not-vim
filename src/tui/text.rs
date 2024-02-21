@@ -204,6 +204,7 @@ impl Style {
     /// Take self and add a [`Modifier`] on to it.
     ///
     /// Returns Self to allow method chaining.
+    #[allow(dead_code)]
     pub fn add_modifier(mut self, modifier: Modifier) -> Self {
         self.modifiers |= modifier;
         self

@@ -4,7 +4,7 @@
 
 pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use crate::editor_view::Mode;
+use crate::editor::Mode;
 
 pub fn translate_event(mode: Mode, key: Key) -> Message {
     match mode {
