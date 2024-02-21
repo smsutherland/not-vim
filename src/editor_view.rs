@@ -12,6 +12,7 @@ use crate::{
 /// This struct is a wrapper around [`Editor`] and [`Deref`]s to [`Editor`].
 /// It stores extra information pertaining to how the contained [`Editor`] will be rendered.
 pub struct EditorView {
+    /// The [`Editor`] being rendered.
     pub editor: Editor,
     /// The bottom status bar of the editor.
     status_bar: StatusBar,
@@ -26,6 +27,11 @@ impl EditorView {
         }
     }
 
+    /// Returns the position of the cursor in the editor.
+    ///
+    /// This is stored in `(row, column)` format.
+    /// The editor stores this as `usize`s for indexing the text, but this function converts it to
+    /// `u16`s to be used for rendering.
     pub fn selected_pos(&self) -> (u16, u16) {
         let (row, col) = self.editor.selected_pos();
         (row as u16, col as u16)
@@ -70,6 +76,7 @@ impl Render for EditorView {
 struct StatusBar {}
 
 impl StatusBar {
+    /// Take a configuration and make a renderable status bar.
     fn make_renderable(&self, position: (u16, u16)) -> RenderableStatusBar {
         RenderableStatusBar {
             _config: self,

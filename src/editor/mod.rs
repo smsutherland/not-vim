@@ -180,8 +180,15 @@ pub fn trim_newlines(line: RopeSlice) -> RopeSlice {
     line.slice(..line.len_chars() - num_newline_chars)
 }
 
+/// An enumeration of possible editor modes.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Mode {
+    /// Normal mode.
+    ///
+    /// This mode is mainly for navigation and editing text.
     Normal,
+    /// Insert mode.
+    ///
+    /// This mode is specifically for inserting text into the buffer.
     Insert,
 }
