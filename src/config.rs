@@ -4,7 +4,7 @@
 
 pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use crate::editor_view::Mode;
+use crate::editor::Mode;
 
 /// Read an event and translate it into a [`Message`].
 ///

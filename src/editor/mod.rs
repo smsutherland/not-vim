@@ -13,7 +13,7 @@ type DocumentID = usize;
 ///
 /// This has all the buffers loaded, as well as information about the cursor and which buffer is
 /// selected.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Editor {
     /// All the buffers in the editor.
     buffers: BTreeMap<DocumentID, Buffer>,
@@ -27,6 +27,8 @@ pub struct Editor {
     ///
     /// This is a position in the buffer, not necessarilly on the screen.
     selected_pos: (usize, usize),
+    /// The current mode of the editor.
+    pub mode: Mode,
 }
 
 impl Editor {
@@ -38,6 +40,7 @@ impl Editor {
             buffers,
             selected_buf: 0,
             selected_pos: (0, 0),
+            mode: Mode::Normal,
         })
     }
 
@@ -175,4 +178,10 @@ pub fn trim_newlines(line: RopeSlice) -> RopeSlice {
         }
     }
     line.slice(..line.len_chars() - num_newline_chars)
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Mode {
+    Normal,
+    Insert,
 }
