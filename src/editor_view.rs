@@ -46,11 +46,10 @@ impl EditorView {
         let regions = region.partition(Bottom);
         let bottom_bar = regions[0];
         let editor_area = regions[1];
-        let bar = self.status_bar.make_renderable({
+        self.status_bar.render(frame, bottom_bar, {
             let pos = self.editor.selected_pos();
             (pos.0 as u16, pos.1 as u16)
         });
-        bar.render(frame, bottom_bar);
 
         let mut text = Text::from({
             let text = self.editor.text();
@@ -83,31 +82,13 @@ impl DerefMut for EditorView {
 struct StatusBar {}
 
 impl StatusBar {
-    /// Take a configuration and make a renderable status bar.
-    fn make_renderable(&self, position: (u16, u16)) -> RenderableStatusBar {
-        RenderableStatusBar {
-            _config: self,
-            position,
-        }
-    }
-}
-
-/// The bottom status bar filled with all the information it requires to properly render
-struct RenderableStatusBar<'a> {
-    /// [`StatusBar`] configuration.
-    _config: &'a StatusBar,
-    /// The position of the cursor in the editor.
-    position: (u16, u16),
-}
-
-impl RenderableStatusBar<'_> {
     /// See [`frame`].
     ///
     /// [`frame`]: crate::tui::frame
-    fn render(&self, frame: &mut Frame, region: Rect) {
+    fn render(&self, frame: &mut Frame, region: Rect, position: (u16, u16)) {
         let bottom = region.top + region.height - 1;
         frame.set_style(Style::default().fg(Color::Black).bg(Color::White), region);
-        let position = format!("{}:{}", self.position.1 + 1, self.position.0 + 1);
+        let position = format!("{}:{}", position.1 + 1, position.0 + 1);
         for (x, c) in position.chars().enumerate() {
             frame.set_char(c, region.width - 15 + x as u16, bottom)
         }
