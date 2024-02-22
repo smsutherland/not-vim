@@ -73,7 +73,7 @@ fn try_main() -> anyhow::Result<()> {
     loop {
         term.resize();
         term.draw(|f| {
-            f.render(&editor_view, f.size());
+            editor_view.render(f, f.size());
             Some(editor_view.selected_pos())
         })?;
 

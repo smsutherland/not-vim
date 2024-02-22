@@ -4,13 +4,15 @@ use std::ops::{Deref, DerefMut};
 
 use crate::{
     editor::Editor,
-    tui::{rect::Bottom, Color, Frame, Rect, Render, Style, Text},
+    tui::{rect::Bottom, Color, Frame, Rect, Style, Text},
 };
 
-/// An [`Editor`] which can be [`Render`]ed.
+/// An [`Editor`] which can be [`render`]ed.
 ///
 /// This struct is a wrapper around [`Editor`] and [`Deref`]s to [`Editor`].
 /// It stores extra information pertaining to how the contained [`Editor`] will be rendered.
+///
+/// [`render`]: EditorView::render
 pub struct EditorView {
     /// The [`Editor`] being rendered.
     pub editor: Editor,
@@ -36,6 +38,28 @@ impl EditorView {
         let (row, col) = self.editor.selected_pos();
         (row as u16, col as u16)
     }
+
+    /// See [`frame`].
+    ///
+    /// [`frame`]: crate::tui::frame
+    pub fn render(&self, frame: &mut Frame, region: Rect) {
+        let regions = region.partition(Bottom);
+        let bottom_bar = regions[0];
+        let editor_area = regions[1];
+        let bar = self.status_bar.make_renderable({
+            let pos = self.editor.selected_pos();
+            (pos.0 as u16, pos.1 as u16)
+        });
+        bar.render(frame, bottom_bar);
+
+        let mut text = Text::from({
+            let text = self.editor.text();
+            let idx = text.line_to_char(0);
+            text.slice(idx..)
+        });
+        text.wrap(crate::config::WRAP_MODE);
+        text.render(frame, editor_area);
+    }
 }
 
 impl Deref for EditorView {
@@ -48,23 +72,6 @@ impl Deref for EditorView {
 impl DerefMut for EditorView {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.editor
-    }
-}
-
-impl Render for EditorView {
-    fn render(&self, frame: &mut Frame, region: Rect) {
-        let regions = region.partition(Bottom);
-        let bottom_bar = regions[0];
-        let editor_area = regions[1];
-        let bar = self.status_bar.make_renderable({
-            let pos = self.editor.selected_pos();
-            (pos.0 as u16, pos.1 as u16)
-        });
-        frame.render(&bar, bottom_bar);
-
-        let mut text = Text::from(self.editor.text());
-        text.wrap(crate::config::WRAP_MODE);
-        frame.render(&text, editor_area);
     }
 }
 
@@ -93,7 +100,10 @@ struct RenderableStatusBar<'a> {
     position: (u16, u16),
 }
 
-impl Render for RenderableStatusBar<'_> {
+impl RenderableStatusBar<'_> {
+    /// See [`frame`].
+    ///
+    /// [`frame`]: crate::tui::frame
     fn render(&self, frame: &mut Frame, region: Rect) {
         let bottom = region.top + region.height - 1;
         frame.set_style(Style::default().fg(Color::Black).bg(Color::White), region);

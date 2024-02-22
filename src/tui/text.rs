@@ -5,7 +5,7 @@
 
 use crate::{config::WrapMode, editor::trim_newlines};
 
-use super::{Frame, Rect, Render};
+use super::{Frame, Rect};
 use bitflags::bitflags;
 use crossterm::{
     style::{Attribute, Color, SetAttribute, SetBackgroundColor, SetForegroundColor},
@@ -31,6 +31,17 @@ impl<'a> Text<'a> {
     /// See [`WrapMode`].
     pub fn wrap(&mut self, wrap_mode: WrapMode) {
         self.wrap_mode = wrap_mode;
+    }
+
+    /// See [`frame`].
+    ///
+    /// [`frame`]: crate::tui::frame
+    pub fn render(&self, frame: &mut Frame, region: Rect) {
+        match self.wrap_mode {
+            WrapMode::Wrap => self.render_wrap(frame, region),
+            WrapMode::NoWrap(Some(c)) => self.render_no_wrap_with_char(frame, region, c),
+            WrapMode::NoWrap(None) => self.render_no_wrap(frame, region),
+        }
     }
 
     /// Renders the text in the case where `self.wrap_mode` is set to [`WrapMode::Wrap`].
@@ -101,16 +112,6 @@ impl<'a> Text<'a> {
     }
 }
 
-impl Render for Text<'_> {
-    fn render(&self, frame: &mut Frame, region: Rect) {
-        match self.wrap_mode {
-            WrapMode::Wrap => self.render_wrap(frame, region),
-            WrapMode::NoWrap(Some(c)) => self.render_no_wrap_with_char(frame, region, c),
-            WrapMode::NoWrap(None) => self.render_no_wrap(frame, region),
-        }
-    }
-}
-
 impl<'a, T> From<T> for Text<'a>
 where
     T: Into<RopeSlice<'a>>,
@@ -142,8 +143,12 @@ impl<'a> From<&'a String> for SingleText<'a> {
     }
 }
 
-impl Render for SingleText<'_> {
-    fn render(&self, frame: &mut Frame, region: Rect) {
+#[allow(dead_code)]
+impl SingleText<'_> {
+    /// See [`frame`].
+    ///
+    /// [`frame`]: crate::tui::frame
+    pub fn render(&self, frame: &mut Frame, region: Rect) {
         for (x, c) in self.text.chars().enumerate() {
             frame.set_char(c, x as u16 + region.left, region.top);
         }

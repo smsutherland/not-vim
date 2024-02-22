@@ -2,7 +2,7 @@
 //!
 //! Contains information about [`Buffer`]s and individual [`Cell`]s.
 
-mod frame;
+pub mod frame;
 pub mod rect;
 mod text;
 
@@ -226,26 +226,4 @@ impl Terminal {
         });
         self.flush(final_position)
     }
-}
-
-/// Take a [`Frame`] and draw to its underlying [`Buffer`].
-///
-/// This is currently achieved by mainly using the [`Frame::set_char`] method, which allows you to,
-/// one character at a time, draw out the content being displayed. [`Frame::render`] can be called to
-/// draw other objects implimenting [Render].
-///
-/// Example implimentation of [`Render`] on [`String`]:
-/// ```
-/// impl Render for String {
-///     fn render(&self, frame: &mut Frame) -> anyhow::Result<()> {
-///         for (i, c) in self.chars().enumerate() {
-///             frame.set_char(c, i, 0);
-///         }
-///         Ok(())
-///     }
-/// }
-/// ```
-pub trait Render {
-    /// Take a [`Frame`] and draw to its underlying [`Buffer`].
-    fn render(&self, frame: &mut Frame, region: Rect);
 }

@@ -1,6 +1,24 @@
 //! A [`Frame`] represents a single region of a terminal which can be drawn to.
+//!
+//! [`Frame`]s are usually rendered to via a `render` method on a struct.
+//! This is not implemented as a trait to allow each struct to define its own mutability and other
+//! parameters for rendering.
+//!
+//! This is currently achieved by mainly using the [`Frame::set_char`] method, which allows you to,
+//! one character at a time, draw out the content being displayed.
+//! Example implimentation of `render` on [`String`]:
+//! ```
+//! impl String {
+//!     fn render(&self, frame: &mut Frame, region: Rect) {
+//!         for (i, c) in self.chars().enumerate() {
+//!             frame.set_char(c, region.left + i, region.top);
+//!         }
+//!     }
+//! }
+//! ```
+//!
 
-use super::{Buffer, Rect, Render, Style};
+use super::{Buffer, Rect, Style};
 
 /// An abstraction around drawing to a region of a [`Buffer`].
 pub struct Frame<'a> {
@@ -9,12 +27,6 @@ pub struct Frame<'a> {
 }
 
 impl Frame<'_> {
-    /// Draw a [`Render`]able item to the [`Frame`].
-    #[inline]
-    pub fn render(&mut self, item: &impl Render, region: Rect) {
-        item.render(self, region);
-    }
-
     /// Sets the char at a single location in the frame.
     pub fn set_char(&mut self, c: char, x: u16, y: u16) {
         // Should these panic or should the function return a Result?
