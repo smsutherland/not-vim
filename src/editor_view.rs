@@ -18,6 +18,8 @@ pub struct EditorView {
     pub editor: Editor,
     /// The bottom status bar of the editor.
     status_bar: StatusBar,
+    /// The position of the top-right corner of the view rectangle in the editor.
+    view_pos: (usize, usize),
 }
 
 impl EditorView {
@@ -26,6 +28,7 @@ impl EditorView {
         Self {
             editor,
             status_bar: StatusBar::default(),
+            view_pos: (0, 0),
         }
     }
 
@@ -53,11 +56,27 @@ impl EditorView {
 
         let mut text = Text::from({
             let text = self.editor.text();
-            let idx = text.line_to_char(0);
+            let idx = text.line_to_char(self.view_pos.1);
             text.slice(idx..)
         });
         text.wrap(crate::config::WRAP_MODE);
         text.render(frame, editor_area);
+    }
+
+    pub fn resize(&mut self, new_size: (u16, u16)) {
+        let editor_pos = self.editor.selected_pos();
+        if editor_pos.1 < self.view_pos.1 {
+            self.view_pos.1 = editor_pos.1;
+        }
+        // +1 because of line at the bottom for status bar.
+        if editor_pos.1 - self.view_pos.1 + 1 >= new_size.1 as usize {
+            self.view_pos.1 = editor_pos.1 + 2 - new_size.1 as usize;
+        }
+    }
+
+    /// Get the current view position of the editor view
+    pub fn view_pos(&self) -> (usize, usize) {
+        self.view_pos
     }
 }
 

@@ -16,7 +16,9 @@ use crossterm::{
     cursor::SetCursorStyle,
     event::{read, Event, KeyEventKind},
     execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    terminal::{
+        self, disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+    },
 };
 use editor::Mode;
 use editor_view::EditorView;
@@ -65,16 +67,22 @@ fn try_main() -> anyhow::Result<()> {
     let _asg = AlternateScreenGuard;
 
     let mut term = Terminal::new();
-
     let editor = editor::Editor::open(&args.file)
         .context("Could not create an editor from the file given")?;
     let mut editor_view = EditorView::new(editor);
 
     loop {
         term.resize();
+        let size = terminal::size().expect("unable to get the dimensions of the terminal");
+        editor_view.resize(size);
         term.draw(|f| {
             editor_view.render(f, f.size());
-            Some(editor_view.selected_pos())
+            let selected_pos = editor_view.selected_pos();
+            let view_pos = editor_view.view_pos();
+            Some((
+                selected_pos.0 - view_pos.0 as u16,
+                selected_pos.1 - view_pos.1 as u16,
+            ))
         })?;
 
         let Event::Key(event) = read().context("Could not read an event from the terminal")? else {
