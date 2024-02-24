@@ -10,8 +10,6 @@
 //! much work. ¯\\_(ツ)_/¯
 
 use anyhow::Context;
-use args::Args;
-use config::Message;
 use crossterm::{
     cursor::SetCursorStyle,
     event::{read, Event, KeyEventKind},
@@ -20,15 +18,16 @@ use crossterm::{
         self, disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
     },
 };
-use editor::Mode;
 use editor_view::EditorView;
 use gag::Hold;
+use not_vim::{
+    args::Args,
+    config::{translate_event, Message},
+    editor::{Editor, Mode},
+};
 use std::io;
 use tui::Terminal;
 
-mod args;
-mod config;
-mod editor;
 mod editor_view;
 mod tui;
 
@@ -67,8 +66,8 @@ fn try_main() -> anyhow::Result<()> {
     let _asg = AlternateScreenGuard;
 
     let mut term = Terminal::new();
-    let editor = editor::Editor::open(&args.file)
-        .context("Could not create an editor from the file given")?;
+    let editor =
+        Editor::open(&args.file).context("Could not create an editor from the file given")?;
     let mut editor_view = EditorView::new(editor);
 
     loop {
@@ -92,7 +91,7 @@ fn try_main() -> anyhow::Result<()> {
             continue;
         }
 
-        let message = config::translate_event(editor_view.editor.mode, event.into());
+        let message = translate_event(editor_view.editor.mode, event.into());
         match message {
             Message::Quit => {
                 break;

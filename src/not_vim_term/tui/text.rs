@@ -3,7 +3,7 @@
 //! TODO: more robust handling of multiline strings.
 //! TODO: stylized strings.
 
-use crate::{config::WrapMode, editor::trim_newlines};
+use not_vim::{config::WrapMode, editor::trim_newlines};
 
 use super::{Frame, Rect};
 use bitflags::bitflags;

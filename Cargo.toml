@@ -10,9 +10,7 @@ keywords = ["editor"]
 
 [[bin]]
 name = "notvim"
-path = "src/main.rs"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+path = "./src/not_vim_term/main.rs"
 
 [dependencies]
 crossterm = "0.27"

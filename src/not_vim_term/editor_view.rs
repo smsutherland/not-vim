@@ -2,10 +2,8 @@
 
 use std::ops::{Deref, DerefMut};
 
-use crate::{
-    editor::Editor,
-    tui::{rect::Bottom, Color, Frame, Rect, Style, Text},
-};
+use crate::tui::{rect::Bottom, Color, Frame, Rect, Style, Text};
+use not_vim::editor::Editor;
 
 /// An [`Editor`] which can be [`render`]ed.
 ///
@@ -59,7 +57,7 @@ impl EditorView {
             let idx = text.line_to_char(self.view_pos.1);
             text.slice(idx..)
         });
-        text.wrap(crate::config::WRAP_MODE);
+        text.wrap(not_vim::config::WRAP_MODE);
         text.render(frame, editor_area);
     }
 
