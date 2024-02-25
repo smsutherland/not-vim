@@ -32,6 +32,16 @@ pub struct Editor {
 }
 
 impl Editor {
+    pub fn new() -> Self {
+        let mut buffers = BTreeMap::new();
+        buffers.insert(0, Buffer::empty());
+        Self {
+            buffers,
+            selected_buf: 0,
+            selected_pos: (0, 0),
+            mode: Mode::Normal,
+        }
+    }
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let mut buffers = BTreeMap::new();
@@ -77,7 +87,7 @@ impl Editor {
 
     /// Returns a reference to the whole text of this [`Editor`].
     pub fn text(&self) -> RopeSlice {
-        self.buffers[&self.selected_buf].text()
+        self.buffers[&self.selected_buf].text.slice(..)
     }
 
     /// Returns the cursor pos of this [`Editor`].
@@ -150,6 +160,18 @@ impl Editor {
                 self.selected_pos.0 = line_len;
             }
         }
+    }
+
+    pub fn active_fname(&self) -> Option<&str> {
+        self.buffers
+            .get(&self.selected_buf)
+            .and_then(|buf| buf.file.as_deref())
+    }
+}
+
+impl Default for Editor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

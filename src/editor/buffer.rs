@@ -5,7 +5,7 @@
 //! A buffer contains both the content of the buffer and the file which it refers to.
 
 use anyhow::Context;
-use ropey::{iter::Lines, Rope, RopeSlice};
+use ropey::{iter::Lines, Rope};
 
 /// A single buffer of text. May refer to a specific file or be a free-floating buffer.
 /// See the [module] level documentation for more.
@@ -14,12 +14,19 @@ use ropey::{iter::Lines, Rope, RopeSlice};
 #[derive(Debug, Clone)]
 pub struct Buffer {
     /// Text contents of the buffer represented by a [`Rope`].
-    text: Rope,
+    pub text: Rope,
     /// The path to the file on disk (if the buffer references one).
-    file: Option<String>,
+    pub file: Option<String>,
 }
 
 impl Buffer {
+    pub fn empty() -> Self {
+        Self {
+            text: Rope::new(),
+            file: None,
+        }
+    }
+
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let file = std::fs::File::open(fname)
@@ -82,10 +89,5 @@ impl Buffer {
     /// Returns a reference to the lines of this [`Buffer`].
     pub fn lines(&self) -> Lines {
         self.text.lines()
-    }
-
-    /// Returns a reference to all the text of this [`Buffer`].
-    pub fn text(&self) -> RopeSlice {
-        self.text.slice(..)
     }
 }

@@ -58,7 +58,7 @@ fn main() {
 
 /// This is the main function which is extracted out for better error handling.
 fn try_main() -> anyhow::Result<()> {
-    let args = Args::parse_args().context("Could not parse command line arguments")?;
+    let args = Args::parse_args();
 
     enable_raw_mode().context("Failed to enter raw mode.")?;
     let mut stdout = io::stdout();
@@ -68,8 +68,12 @@ fn try_main() -> anyhow::Result<()> {
     let _asg = AlternateScreenGuard;
 
     let mut term = Terminal::new();
-    let editor =
-        Editor::open(&args.file).context("Could not create an editor from the file given")?;
+    let editor = match args.file {
+        Some(fname) => {
+            Editor::open(&fname).context("Could not create an editor from the file given")?
+        }
+        None => Editor::new(),
+    };
     let mut editor_view = EditorView::new(editor);
 
     loop {
@@ -101,7 +105,10 @@ fn try_main() -> anyhow::Result<()> {
             Message::Write => {
                 editor_view
                     .write()
-                    .with_context(|| format!("Could not write to file {}", args.file))?;
+                    .with_context(|| match editor_view.active_fname() {
+                        Some(fname) => format!("Could not write to file {}", fname),
+                        None => String::from("No file to write to"),
+                    })?;
             }
             Message::Enter => editor_view.newline(),
             Message::Backspace => editor_view.backspace(),
