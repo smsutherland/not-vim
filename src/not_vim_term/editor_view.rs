@@ -61,6 +61,10 @@ impl EditorView {
         text.render(frame, editor_area);
     }
 
+    /// Handles the resizing of the editor view.
+    ///
+    /// Currently this involves moving the screen when the cursor goes off the end of the screen on
+    /// the top or bottom.
     pub fn resize(&mut self, new_size: (u16, u16)) {
         let editor_pos = self.editor.selected_pos();
         if editor_pos.1 < self.view_pos.1 {
