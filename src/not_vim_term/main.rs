@@ -10,6 +10,7 @@
 //! much work. ¯\\_(ツ)_/¯
 
 use anyhow::Context;
+use args::Args;
 use crossterm::{
     cursor::SetCursorStyle,
     event::{read, Event, KeyEventKind},
@@ -21,13 +22,14 @@ use crossterm::{
 use editor_view::EditorView;
 use gag::Hold;
 use not_vim::{
-    args::Args,
     config::{translate_event, Message},
-    editor::{Editor, Mode},
+    editor::Mode,
+    Editor,
 };
 use std::io;
 use tui::Terminal;
 
+mod args;
 mod editor_view;
 mod tui;
 
