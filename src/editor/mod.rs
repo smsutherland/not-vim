@@ -7,7 +7,14 @@ use std::collections::BTreeMap;
 mod buffer;
 
 /// Documents are indexed by a unique usize.
-type DocumentID = usize;
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq)]
+struct DocumentID(usize);
+
+impl From<usize> for DocumentID {
+    fn from(value: usize) -> Self {
+        Self(value)
+    }
+}
 
 /// The main editor struct.
 ///
@@ -34,10 +41,10 @@ pub struct Editor {
 impl Editor {
     pub fn new() -> Self {
         let mut buffers = BTreeMap::new();
-        buffers.insert(0, Buffer::empty());
+        buffers.insert(0.into(), Buffer::empty());
         Self {
             buffers,
-            selected_buf: 0,
+            selected_buf: 0.into(),
             selected_pos: (0, 0),
             mode: Mode::Normal,
         }
@@ -45,10 +52,10 @@ impl Editor {
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
         let mut buffers = BTreeMap::new();
-        buffers.insert(0, Buffer::open(fname)?);
+        buffers.insert(0.into(), Buffer::open(fname)?);
         Ok(Self {
             buffers,
-            selected_buf: 0,
+            selected_buf: 0.into(),
             selected_pos: (0, 0),
             mode: Mode::Normal,
         })
