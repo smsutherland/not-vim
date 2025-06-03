@@ -17,7 +17,9 @@ pub fn translate_event(mode: Mode, key: Key) -> Message {
     }
 }
 
-/// Translate a [`KeyEvent`] into a [`Message`] for normal mode.
+/// Translate a [`KeyEvent`] into a [`Message`] for [normal] mode.
+///
+/// [normal]: Mode::Normal
 fn normal_mode_event(key: Key) -> Message {
     match key {
         Key {
@@ -59,7 +61,9 @@ fn normal_mode_event(key: Key) -> Message {
     }
 }
 
-/// Translate a [`KeyEvent`] into a [`Message`] for insert mode.
+/// Translate a [`KeyEvent`] into a [`Message`] for [insert] mode.
+///
+/// [insert]: Mode::Insert
 fn insert_mode_event(key: Key) -> Message {
     match key {
         Key {
