@@ -29,13 +29,30 @@ impl Buffer {
 
     /// Open a file and read its contents to the buffer.
     pub fn open(fname: &str) -> anyhow::Result<Self> {
-        let file = std::fs::File::open(fname)
-            .with_context(|| format!("Opening file `{fname}` failed."))?;
-        let rope = Rope::from_reader(file)?;
-        Ok(Self {
-            text: rope,
-            file: Some(fname.to_owned()),
-        })
+        match std::fs::File::open(fname) {
+            Ok(file) => {
+                let rope = Rope::from_reader(file)?;
+                Ok(Self {
+                    text: rope,
+                    file: Some(fname.to_owned()),
+                })
+            }
+            Err(err) => {
+                match err.kind() {
+                    std::io::ErrorKind::NotFound => {
+                        // We can just create the file ourselves.
+                        Ok(Self {
+                            text: Rope::new(),
+                            file: Some(fname.to_owned()),
+                        })
+                    }
+                    std::io::ErrorKind::PermissionDenied => {
+                        Err(err).with_context(|| format!("Permission denied: `{fname}`"))
+                    }
+                    _ => Err(err).with_context(|| format!("Unknown error opening file `{fname}`")),
+                }
+            }
+        }
     }
 
     /// Append a single character to the [`Buffer`] at the provided coordinates.
