@@ -79,6 +79,7 @@ impl Buffer {
                 .read(true)
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .open(file)
                 .with_context(|| format!("Opening file `{file}` failed."))?;
             self.text.write_to(file)?;
