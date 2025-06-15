@@ -1,0 +1,17 @@
+[dependencies]
+crossterm.workspace = true
+gag.workspace = true
+anyhow.workspace = true
+bitflags.workspace = true
+ropey.workspace = true
+not-vim = { path = "../not_vim/" }
+
+[package]
+name = "not-vim-tui"
+version = "0.1.0"
+edition = "2021"
+description = "I'm not sure what this is but it sure isn't vim"
+repository = "https://github.com/smsutherland/not-vim"
+authors = ["Sagan Sutherland <sagan@farthinghalearms.com>"]
+categories = ["editor", "command-line-utilities"]
+keywords = ["editor"]

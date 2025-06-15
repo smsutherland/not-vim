@@ -1,18 +1,8 @@
-[package]
-name = "not-vim"
-version = "0.1.0"
-edition = "2021"
-description = "I'm not sure what this is but it sure isn't vim"
-repository = "https://github.com/smsutherland/not-vim"
-authors = ["Sagan Sutherland <sagan@farthinghalearms.com>"]
-categories = ["editor", "command-line-utilities"]
-keywords = ["editor"]
+[workspace]
+resolver = "3"
+members = ["not_vim", "not_vim_terminal"]
 
-[[bin]]
-name = "notvim"
-path = "./src/not_vim_term/main.rs"
-
-[dependencies]
+[workspace.dependencies]
 crossterm = "0.27"
 gag = "1"
 anyhow = "1"
